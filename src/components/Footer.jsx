@@ -1,6 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Instagram, Twitter, Linkedin } from 'lucide-react';
+
+import logo from '../assets/1000665431.png';
 
 const Footer = () => {
     return (
@@ -37,18 +39,7 @@ const Footer = () => {
                         viewport={{ once: true }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                            <div style={{
-                                width: '40px',
-                                height: '40px',
-                                background: 'linear-gradient(135deg, var(--color-soar), var(--color-restore))',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}>
-                                <Shield size={22} color="white" />
-                            </div>
-                            <span style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.75rem', letterSpacing: '1px' }}>RYZNO</span>
+                            <img src={logo} alt="RYZNO" style={{ height: '50px', objectFit: 'contain' }} />
                         </div>
                         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '2.5rem', fontSize: '1rem', maxWidth: '400px' }}>
                             Risen and Ordained. Cultivating authenticity, moral authority, and spiritual grounding in a shifting culture.

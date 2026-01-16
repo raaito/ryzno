@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Menu, X, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import logo from '../assets/1000665431.png';
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,23 +33,7 @@ const Navbar = () => {
         border: '1px solid rgba(255,255,255,0.1)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            background: 'linear-gradient(135deg, var(--color-soar), var(--color-restore))',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Shield size={18} color="white" />
-          </div>
-          <span style={{
-            fontFamily: 'Outfit',
-            fontWeight: 800,
-            fontSize: '1.1rem',
-            letterSpacing: '1px'
-          }}>RYZNO</span>
+          <img src={logo} alt="RYZNO" style={{ height: '40px', objectFit: 'contain' }} />
         </div>
 
         {/* Desktop Links */}

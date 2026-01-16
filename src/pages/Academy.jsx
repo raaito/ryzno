@@ -4,6 +4,8 @@ import { BookOpen, Play, Music, FileText, CheckCircle, ChevronRight, Layout, Log
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+import logo from '../assets/1000665431.png';
+
 const Academy = () => {
     const { user, token, logout } = useAuth();
     const navigate = useNavigate();
@@ -62,7 +64,9 @@ const Academy = () => {
         <div style={{ background: '#f8f9fa', minHeight: '100vh', color: '#1a1a1a', fontFamily: 'Inter, sans-serif' }}>
             <nav style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100, background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <Link to="/" style={{ color: '#000', textDecoration: 'none', fontWeight: 800, fontFamily: 'Outfit', fontSize: '1.2rem' }}>RYZNO</Link>
+                    <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
+                        <img src={logo} alt="RYZNO" style={{ height: '32px', objectFit: 'contain' }} />
+                    </Link>
                     <div style={{ width: '1px', height: '20px', background: 'rgba(0,0,0,0.1)' }} className="nav-divider"></div>
                     <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-soar)', letterSpacing: '1px' }} className="nav-academy-text">S.O.A.R ACADEMY</span>
                 </div>
