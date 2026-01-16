@@ -79,7 +79,7 @@ const ContactSection = () => {
                         className="glass"
                         style={{
                             padding: 'clamp(1rem, 4vw, 2.5rem)',
-                            background: 'rgba(255,255,255,0.02)',
+                            background: 'rgba(255,255,255,0.5)',
                             borderRadius: '20px',
                             width: '100%',
                             boxSizing: 'border-box'
@@ -90,10 +90,10 @@ const ContactSection = () => {
                                 <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Full Name</label>
                                 <input type="text" placeholder="John Doe" style={{
                                     padding: '0.8rem 1rem',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    color: 'white',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: 'var(--text-primary)',
                                     borderRadius: '8px',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(0,0,0,0.1)',
                                     outline: 'none',
                                     fontSize: '0.9rem',
                                     width: '100%',
@@ -105,10 +105,10 @@ const ContactSection = () => {
                                 <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>Email Address</label>
                                 <input type="email" placeholder="john@example.com" style={{
                                     padding: '0.8rem 1rem',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    color: 'white',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: 'var(--text-primary)',
                                     borderRadius: '8px',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(0,0,0,0.1)',
                                     outline: 'none',
                                     fontSize: '0.9rem',
                                     width: '100%',
@@ -120,10 +120,10 @@ const ContactSection = () => {
                                 <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>How can we help?</label>
                                 <textarea placeholder="Tell us your story..." rows="3" style={{
                                     padding: '0.8rem 1rem',
-                                    background: 'rgba(255,255,255,0.03)',
-                                    color: 'white',
+                                    background: 'rgba(255,255,255,0.8)',
+                                    color: 'var(--text-primary)',
                                     borderRadius: '8px',
-                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    border: '1px solid rgba(0,0,0,0.1)',
                                     outline: 'none',
                                     fontSize: '0.9rem',
                                     resize: 'none',
@@ -138,7 +138,7 @@ const ContactSection = () => {
                                 className="glow-soar" style={{
                                     padding: '1rem',
                                     background: 'var(--color-soar)',
-                                    color: 'black',
+                                    color: 'white',
                                     fontWeight: 800,
                                     borderRadius: '8px',
                                     border: 'none',

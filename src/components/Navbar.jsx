@@ -30,7 +30,7 @@ const Navbar = () => {
         alignItems: 'center',
         borderRadius: '100px',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.1)'
+        border: '1px solid var(--glass-border)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <img src={logo} alt="RYZNO" style={{ height: '40px', objectFit: 'contain' }} />
@@ -39,7 +39,7 @@ const Navbar = () => {
         {/* Desktop Links */}
         <div className="desktop-nav" style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
           {navLinks.map((link) => (
-            <a key={link.name} href={link.href} style={{ fontSize: '0.85rem', fontWeight: 600, opacity: 0.7, color: 'white', transition: 'all 0.3s ease' }}>
+            <a key={link.name} href={link.href} style={{ fontSize: '0.85rem', fontWeight: 600, opacity: 0.8, color: 'var(--text-primary)', transition: 'all 0.3s ease' }}>
               {link.name}
             </a>
           ))}
@@ -49,7 +49,7 @@ const Navbar = () => {
             fontSize: '0.8rem',
             fontWeight: 700,
             background: 'var(--color-soar)',
-            color: 'black',
+            color: 'white',
             border: 'none',
             marginLeft: '0.5rem',
             cursor: 'pointer'
@@ -62,7 +62,7 @@ const Navbar = () => {
         <button
           className="mobile-toggle"
           onClick={() => setIsOpen(!isOpen)}
-          style={{ background: 'none', border: 'none', color: 'white', display: 'none', cursor: 'pointer' }}
+          style={{ background: 'none', border: 'none', color: 'var(--text-primary)', display: 'none', cursor: 'pointer' }}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -74,7 +74,7 @@ const Navbar = () => {
             .mobile-toggle { display: block !important; }
             nav { top: 0.75rem !important; padding: 0.5rem 1rem !important; }
           }
-          .desktop-nav a:hover { opacity: 1 !important; color: var(--color-soar); }
+          .desktop-nav a:hover { opacity: 1 !important; color: var(--color-soar) !important; }
         ` }} />
       </nav>
 
@@ -90,16 +90,17 @@ const Navbar = () => {
               top: '5rem',
               left: '5%',
               width: '90%',
-              background: 'rgba(10, 10, 10, 0.95)',
+              background: 'rgba(255, 255, 255, 0.98)',
               backdropFilter: 'blur(20px)',
               borderRadius: '24px',
               padding: '2rem',
               zIndex: 999,
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: '1px solid var(--glass-border)',
               display: 'flex',
               flexDirection: 'column',
               gap: '1.5rem',
-              textAlign: 'center'
+              textAlign: 'center',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
             }}
           >
             {navLinks.map((link) => (
@@ -107,7 +108,7 @@ const Navbar = () => {
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                style={{ fontSize: '1.25rem', fontWeight: 700, color: 'white' }}
+                style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-primary)' }}
               >
                 {link.name}
               </a>
@@ -120,7 +121,7 @@ const Navbar = () => {
                 fontSize: '1rem',
                 fontWeight: 800,
                 background: 'var(--color-soar)',
-                color: 'black',
+                color: 'white',
                 border: 'none'
               }}
               onClick={() => { setIsOpen(false); document.getElementById('contact').scrollIntoView({ behavior: 'smooth' }); }}

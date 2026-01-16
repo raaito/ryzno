@@ -51,7 +51,7 @@ const HeroSection = () => {
     const values = [
         { icon: <Shield size={20} />, label: "Accountability", color: "var(--color-soar)" },
         { icon: <Target size={20} />, label: "Responsibility", color: "var(--color-restore)" },
-        { icon: <Award size={20} />, label: "Authenticity", color: "white" }
+        { icon: <Award size={20} />, label: "Authenticity", color: "var(--text-primary)" }
     ];
 
     return (
@@ -62,7 +62,7 @@ const HeroSection = () => {
             justifyContent: 'center',
             position: 'relative',
             overflow: 'hidden',
-            background: 'var(--bg-dark)',
+            background: 'var(--bg-primary)',
             width: '100%'
         }}>
             {/* Background Slider */}
@@ -70,7 +70,7 @@ const HeroSection = () => {
                 <motion.div
                     key={currentSlide}
                     initial={{ opacity: 0, scale: 1.1 }}
-                    animate={{ opacity: 0.3, scale: 1 }}
+                    animate={{ opacity: 0.6, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 1.5, ease: "easeInOut" }}
                     style={{
@@ -83,7 +83,7 @@ const HeroSection = () => {
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         zIndex: 0,
-                        filter: 'grayscale(30%)'
+                        filter: 'none'
                     }}
                 />
             </AnimatePresence>
@@ -95,7 +95,7 @@ const HeroSection = () => {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'radial-gradient(circle at center, transparent 0%, var(--bg-dark) 85%)',
+                background: 'radial-gradient(circle at center, transparent 30%, var(--bg-primary) 95%)',
                 zIndex: 1
             }}></div>
 
@@ -125,8 +125,8 @@ const HeroSection = () => {
                             gap: '0.75rem',
                             padding: '0.5rem 1.25rem',
                             borderRadius: '100px',
-                            background: 'rgba(255,255,255,0.03)',
-                            border: '1px solid rgba(255,255,255,0.1)',
+                            background: 'rgba(255,255,255,0.5)',
+                            border: '1px solid rgba(0,0,0,0.05)',
                             marginBottom: '1.5rem',
                             fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
                             letterSpacing: '2px',
@@ -146,17 +146,20 @@ const HeroSection = () => {
                             letterSpacing: '-0.04em',
                             width: '100%',
                             padding: '0 10px',
-                            boxSizing: 'border-box'
+                            boxSizing: 'border-box',
+                            color: 'var(--text-primary)',
+                            textShadow: '0 0 30px rgba(255,255,255,0.8)'
                         }}>
                             {slides[currentSlide].title}
                         </h1>
                         <p style={{
                             fontSize: 'clamp(0.95rem, 4vw, 2.2rem)',
-                            color: 'var(--text-secondary)',
+                            color: 'var(--text-primary)',
+                            textShadow: '0 0 30px rgba(255,255,255,0.8)',
                             maxWidth: '100%',
                             width: '700px',
                             margin: '0 auto 3rem auto',
-                            fontWeight: 300,
+                            fontWeight: 400,
                             lineHeight: 1.3,
                             letterSpacing: '-0.01em',
                             padding: '0 20px',
@@ -181,23 +184,23 @@ const HeroSection = () => {
                                     fontSize: '0.95rem',
                                     fontWeight: 800,
                                     background: 'var(--color-soar)',
-                                    color: 'black',
+                                    color: 'white',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    boxShadow: '0 10px 30px rgba(245, 158, 11, 0.15)',
+                                    boxShadow: '0 10px 30px rgba(245, 158, 11, 0.25)',
                                     minWidth: '160px'
                                 }} onClick={() => navigate('/academy')}>
                                 Explore Academy
                             </motion.button>
                             <motion.button
-                                whileHover={{ scale: 1.05, background: 'rgba(255,255,255,0.08)' }}
+                                whileHover={{ scale: 1.05, background: 'rgba(0,0,0,0.05)' }}
                                 whileTap={{ scale: 0.95 }}
                                 className="glass" style={{
                                     padding: '1rem 2rem',
                                     borderRadius: '50px',
                                     fontSize: '0.95rem',
                                     fontWeight: 600,
-                                    color: 'white',
+                                    color: 'var(--text-primary)',
                                     cursor: 'pointer',
                                     minWidth: '160px'
                                 }} onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}>
@@ -224,14 +227,14 @@ const HeroSection = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6, delay: 0.3 + i * 0.1 }}
-                            whileHover={{ y: -5, background: 'rgba(255,255,255,0.06)', borderColor: v.color }}
-                            className="glass" style={{ padding: '2rem 1.5rem', textAlign: 'center', cursor: 'default', transition: 'border-color 0.4s ease' }}>
+                            whileHover={{ y: -5, background: 'rgba(255,255,255,0.8)', borderColor: v.color }}
+                            className="glass" style={{ padding: '2rem 1.5rem', textAlign: 'center', cursor: 'default', transition: 'border-color 0.4s ease', background: 'rgba(255,255,255,0.5)' }}>
                             <div style={{ color: v.color, marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>
                                 <motion.div animate={{ y: [0, -5, 0] }} transition={{ repeat: Infinity, duration: 4, delay: i }}>
                                     {v.icon}
                                 </motion.div>
                             </div>
-                            <h4 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase' }}>{v.label}</h4>
+                            <h4 style={{ fontSize: '1rem', fontWeight: 800, letterSpacing: '2px', textTransform: 'uppercase', color: 'var(--text-primary)' }}>{v.label}</h4>
                         </motion.div>
                     ))}
                 </div>
@@ -243,7 +246,7 @@ const HeroSection = () => {
                             width: currentSlide === i ? '30px' : '8px',
                             height: '8px',
                             borderRadius: '100px',
-                            background: currentSlide === i ? 'var(--color-soar)' : 'rgba(255,255,255,0.2)',
+                            background: currentSlide === i ? 'var(--color-soar)' : 'rgba(0,0,0,0.2)',
                             transition: 'all 0.4s ease',
                             cursor: 'pointer'
                         }}></div>

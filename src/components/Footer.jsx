@@ -9,7 +9,7 @@ const Footer = () => {
         <footer style={{
             padding: '8rem 0 4rem 0',
             borderTop: '1px solid var(--glass-border)',
-            background: 'linear-gradient(to bottom, var(--bg-dark), var(--bg-darker))',
+            background: 'linear-gradient(to bottom, #F8FAFC, #E2E8F0)',
             position: 'relative',
             overflow: 'hidden'
         }}>
@@ -21,7 +21,7 @@ const Footer = () => {
                 transform: 'translateX(-50%)',
                 width: '80%',
                 height: '300px',
-                background: 'radial-gradient(circle at center, rgba(245, 158, 11, 0.03) 0%, transparent 70%)',
+                background: 'radial-gradient(circle at center, rgba(245, 158, 11, 0.05) 0%, transparent 70%)',
                 zIndex: 0
             }}></div>
 
@@ -44,7 +44,7 @@ const Footer = () => {
                         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.8, marginBottom: '2.5rem', fontSize: '1rem', maxWidth: '400px' }}>
                             Risen and Ordained. Cultivating authenticity, moral authority, and spiritual grounding in a shifting culture.
                         </p>
-                        <div style={{ display: 'flex', gap: '1.5rem' }}>
+                        <div style={{ display: 'flex', gap: '1.5rem', color: 'var(--text-primary)' }}>
                             <motion.div whileHover={{ y: -3, color: 'var(--color-soar)' }}><Instagram size={22} style={{ opacity: 0.6, cursor: 'pointer' }} /></motion.div>
                             <motion.div whileHover={{ y: -3, color: 'var(--color-soar)' }}><Twitter size={22} style={{ opacity: 0.6, cursor: 'pointer' }} /></motion.div>
                             <motion.div whileHover={{ y: -3, color: 'var(--color-soar)' }}><Linkedin size={22} style={{ opacity: 0.6, cursor: 'pointer' }} /></motion.div>
@@ -89,7 +89,7 @@ const Footer = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.3 }}
                     >
-                        <h4 style={{ fontWeight: 800, marginBottom: '2rem', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '2px', color: 'white' }}>Quick Links</h4>
+                        <h4 style={{ fontWeight: 800, marginBottom: '2rem', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '2px', color: 'var(--text-primary)' }}>Quick Links</h4>
                         <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: '1rem' }}>
                             <li><motion.a whileHover={{ x: 5 }} href="#contact" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Inquiry Form</motion.a></li>
                             <li style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>info@ryzno.com</li>
@@ -100,7 +100,7 @@ const Footer = () => {
 
                 <div style={{
                     paddingTop: '2.5rem',
-                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    borderTop: '1px solid rgba(0,0,0,0.05)',
                     display: 'flex',
                     flexWrap: 'wrap',
                     gap: '2rem',

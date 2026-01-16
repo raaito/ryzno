@@ -1,11 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Core Colors */
-  --bg-dark: #0A0A0B;
-  --bg-darker: #050506;
-  --text-primary: #FFFFFF;
-  --text-secondary: rgba(255, 255, 255, 0.7);
+  /* Core Colors - Light Theme */
+  --bg-primary: #F8FAFC; /* Slate 50 */
+  --bg-secondary: #F1F5F9; /* Slate 100 */
+  --text-primary: #0F172A; /* Slate 900 */
+  --text-secondary: #475569; /* Slate 600 */
   
   /* Pillar Theme Colors */
   --color-soar: #F59E0B; /* Gold/Amber */
@@ -13,10 +13,11 @@
   --color-restore-alt: #F97316; /* Orange */
   --color-roar: #8B5CF6; /* Violet */
   
-  /* Glassmorphism Defaults */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  /* Glassmorphism Defaults - Light */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(226, 232, 240, 0.8);
   --glass-blur: blur(12px);
+  --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   
   /* Spacing & Borders */
   --radius-lg: 24px;
@@ -32,7 +33,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -52,11 +53,12 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
+  box-shadow: var(--glass-shadow);
 }
 
-.glow-soar { box-shadow: 0 0 30px rgba(245, 158, 11, 0.15); }
-.glow-restore { box-shadow: 0 0 30px rgba(239, 68, 68, 0.15); }
-.glow-roar { box-shadow: 0 0 30px rgba(139, 92, 246, 0.15); }
+.glow-soar { box-shadow: 0 0 30px rgba(245, 158, 11, 0.25); }
+.glow-restore { box-shadow: 0 0 30px rgba(239, 68, 68, 0.25); }
+.glow-roar { box-shadow: 0 0 30px rgba(139, 92, 246, 0.25); }
 
 .container {
   max-width: var(--max-width);
@@ -68,7 +70,7 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  background-image: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+  background-image: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
 }
 
 button {
@@ -88,12 +90,12 @@ a {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-dark);
+  background: var(--bg-primary);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #CBD5E1;
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #94A3B8;
 }
