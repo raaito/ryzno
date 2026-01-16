@@ -27,7 +27,7 @@ const LecturerDashboard = () => {
 
     const fetchData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/academy', {
+            const res = await fetch('/api/academy', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -48,7 +48,7 @@ const LecturerDashboard = () => {
     const handleLessonSubmit = async (e) => {
         e.preventDefault();
         setStatus(editingId ? 'Updating...' : 'Publishing...');
-        const url = editingId ? `http://localhost:5000/api/lessons/${editingId}` : 'http://localhost:5000/api/lessons';
+        const url = editingId ? `/api/lessons/${editingId}` : '/api/lessons';
         const method = editingId ? 'PUT' : 'POST';
 
         try {
@@ -77,7 +77,7 @@ const LecturerDashboard = () => {
     const handleCourseSubmit = async (e) => {
         e.preventDefault();
         setStatus(editingId ? 'Updating...' : 'Creating...');
-        const url = editingId ? `http://localhost:5000/api/courses/${editingId}` : 'http://localhost:5000/api/courses';
+        const url = editingId ? `/api/courses/${editingId}` : '/api/courses';
         const method = editingId ? 'PUT' : 'POST';
 
         try {
@@ -103,7 +103,7 @@ const LecturerDashboard = () => {
     const handleDelete = async (type, id) => {
         if (!window.confirm(`Delete this ${type}?`)) return;
         try {
-            const res = await fetch(`http://localhost:5000/api/${type === 'lesson' ? 'lessons' : 'courses'}/${id}`, {
+            const res = await fetch(`/api/${type === 'lesson' ? 'lessons' : 'courses'}/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

@@ -16,7 +16,7 @@ const Academy = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/academy', {
+        fetch('/api/academy', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
             .then(res => res.json())
