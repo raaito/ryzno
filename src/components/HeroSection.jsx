@@ -14,7 +14,7 @@ const HeroSection = () => {
         {
             image: heroImg1,
             tag: "The Movement",
-            title: "RYZNO",
+            title: "RYZN.O",
             subtitle: "Risen and Ordained. Systems of Accountability & divine Responsibility.",
             color: "var(--color-soar)"
         },
