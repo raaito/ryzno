@@ -1,0 +1,1 @@
+to login, you put your email and a code is sent to it if its registered in our systems, else, you don't get a code, code gets you logged in.
