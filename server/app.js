@@ -133,26 +133,40 @@ app.post('/api/auth/register-success', async (req, res) => {
             return res.status(400).json({ message: 'User or Email already registered. Please login.' });
         }
 
-        console.log(`[ONBOARDING] Verifying Selar purchase for ${email}...`);
+        const tryEndpoints = [
+            `https://api.selar.co/v1/checkout/all-sales?email=${encodeURIComponent(email)}`,
+            `https://api.selar.co/v1/sales?email=${encodeURIComponent(email)}`
+        ];
 
-        const selarRes = await fetch(`https://api.selar.co/v1/checkout/all-sales?email=${encodeURIComponent(email)}`, {
-            headers: { 'Authorization': `Bearer ${process.env.SELAR_API_KEY}` }
-        });
+        let hasPurchased = false;
+        let lastStatus = 0;
 
-        if (!selarRes.ok) {
-            console.error('Selar verification failed during onboarding');
-            return res.status(500).json({ message: 'Could not verify purchase with Selar API. Please try again later.' });
+        for (const endpoint of tryEndpoints) {
+            console.log(`[ONBOARDING] Trying Selar endpoint: ${endpoint}`);
+            const selarRes = await fetch(endpoint, {
+                headers: { 'Authorization': `Bearer ${process.env.SELAR_API_KEY}` }
+            });
+
+            if (selarRes.ok) {
+                const data = await selarRes.json();
+                const sales = data.data || [];
+                hasPurchased = sales.some(sale =>
+                    (sale.product_name && sale.product_name.toLowerCase().includes('wealthy place')) ||
+                    (sale.product_id && sale.product_id.toString().includes('wealthy-place'))
+                );
+                if (hasPurchased) break;
+            } else {
+                lastStatus = selarRes.status;
+                const errorBody = await selarRes.text().catch(() => '');
+                console.error(`Selar endpoint failed (${endpoint}): ${selarRes.status} ${errorBody}`);
+            }
         }
 
-        const data = await selarRes.json();
-        const sales = data.data || [];
-        const hasPurchased = sales.some(sale =>
-            (sale.product_name && sale.product_name.toLowerCase().includes('wealthy place')) ||
-            (sale.product_id && sale.product_id.toString().includes('wealthy-place'))
-        );
-
         if (!hasPurchased) {
-            return res.status(403).json({ message: 'No purchase record found for this email on Selar. Please ensure you use the same email used for payment.' });
+            const msg = lastStatus === 401 ? 'Invalid Selar API Key. Please check your Vercel environment variables.' :
+                lastStatus === 404 ? 'No record found on Selar for this email. Ensure you used the same email for payment.' :
+                    'Could not verify purchase with Selar. Please try again or contact support.';
+            return res.status(lastStatus === 401 ? 401 : 403).json({ message: msg });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -190,9 +204,9 @@ app.get('/api/auth/sync-selar', authenticateToken, async (req, res) => {
         });
 
         if (!selarRes.ok) {
-            const errorText = await selarRes.text();
+            const errorText = await selarRes.text().catch(() => 'No error body');
             console.error(`Selar API error (${selarRes.status}):`, errorText);
-            throw new Error(`Selar API error: ${selarRes.status}`);
+            return res.status(500).json({ message: `Selar API error: ${selarRes.status}` });
         }
 
         const data = await selarRes.json();
