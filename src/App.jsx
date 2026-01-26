@@ -11,6 +11,7 @@ import Restore from './pages/Restore';
 import Roar from './pages/Roar';
 import Contact from './pages/Contact';
 import LecturerMessages from './pages/LecturerMessages';
+import Welcome from './pages/Welcome';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/restore" element={<Restore />} />
           <Route path="/roar" element={<Roar />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/welcome" element={<Welcome />} />
 
           {/* Protected Academy Routes (Students and Lecturers) */}
           <Route

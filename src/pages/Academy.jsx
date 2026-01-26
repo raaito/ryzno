@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Play, Music, FileText, CheckCircle, ChevronRight, Layout, LogOut, Search, ArrowLeft, User } from 'lucide-react';
+import { BookOpen, Play, Music, FileText, CheckCircle, ChevronRight, Layout, LogOut, Search, ArrowLeft, User, RefreshCcw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -14,8 +14,15 @@ const Academy = () => {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [selectedLesson, setSelectedLesson] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [syncing, setSyncing] = useState(false);
+    const [syncMessage, setSyncMessage] = useState('');
 
     useEffect(() => {
+        fetchAcademyData();
+    }, [token]);
+
+    const fetchAcademyData = () => {
+        setLoading(true);
         fetch('/api/academy', {
             headers: { 'Authorization': `Bearer ${token}` }
         })
@@ -29,7 +36,29 @@ const Academy = () => {
                 console.error("Failed to fetch academy data:", err);
                 setLoading(false);
             });
-    }, [token]);
+    };
+
+    const handleSync = async () => {
+        setSyncing(true);
+        setSyncMessage('');
+        try {
+            const res = await fetch('/api/auth/sync-selar', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setSyncMessage(data.message);
+                fetchAcademyData(); // Refresh list to show new course
+            } else {
+                setSyncMessage(data.message || 'No new purchases found.');
+            }
+        } catch (err) {
+            setSyncMessage('Failed to connect to sync server.');
+        } finally {
+            setSyncing(false);
+            setTimeout(() => setSyncMessage(''), 5000);
+        }
+    };
 
     const getYoutubeId = (url) => {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -85,8 +114,42 @@ const Academy = () => {
                 <AnimatePresence mode="wait">
                     {!selectedCourse ? (
                         <motion.div key="courses" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}>
-                            <h1 className="hero-title" style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.5rem', color: '#000', letterSpacing: '-1px' }}>Welcome, Sentinel</h1>
-                            <p style={{ color: '#666', fontSize: '1.1rem', fontWeight: 500, marginBottom: '4rem' }}>Select a training path to continue your journey.</p>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem', flexWrap: 'wrap', gap: '2rem' }}>
+                                <div>
+                                    <h1 className="hero-title" style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.5rem', color: '#000', letterSpacing: '-1px' }}>Welcome, Sentinel</h1>
+                                    <p style={{ color: '#666', fontSize: '1.1rem', fontWeight: 500 }}>Select a training path to continue your journey.</p>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.75rem' }}>
+                                    <button
+                                        onClick={handleSync}
+                                        disabled={syncing}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '0.75rem',
+                                            padding: '1rem 2rem',
+                                            background: '#fff',
+                                            border: '1px solid rgba(0,0,0,0.1)',
+                                            borderRadius: '50px',
+                                            fontWeight: 800,
+                                            fontSize: '0.9rem',
+                                            cursor: syncing ? 'not-allowed' : 'pointer',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                                            transition: 'all 0.3s ease'
+                                        }}
+                                        onMouseEnter={(e) => !syncing && (e.currentTarget.style.background = '#fcfcfc')}
+                                        onMouseLeave={(e) => !syncing && (e.currentTarget.style.background = '#fff')}
+                                    >
+                                        <RefreshCcw size={18} className={syncing ? 'spin' : ''} style={{ color: 'var(--color-soar)' }} />
+                                        {syncing ? 'Syncing...' : 'Sync Purchases'}
+                                    </button>
+                                    {syncMessage && (
+                                        <motion.span initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--color-soar)' }}>
+                                            {syncMessage}
+                                        </motion.span>
+                                    )}
+                                </div>
+                            </div>
 
                             <div className="course-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '2.5rem' }}>
                                 {courses.map(course => (
@@ -204,6 +267,9 @@ const Academy = () => {
                     .lesson-number { width: 30px !important; font-size: 1.2rem !important; }
                     .play-button-ui { display: none !important; }
                 }
+
+                .spin { animation: spin 1s linear infinite; }
+                @keyframes spin { 100% { transform: rotate(360deg); } }
 
                 *, *::before, *::after { box-sizing: border-box; }
             ` }} />
