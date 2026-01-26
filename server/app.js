@@ -149,6 +149,7 @@ app.post('/api/auth/register-success', async (req, res) => {
 
             if (selarRes.ok) {
                 const data = await selarRes.json();
+                console.log(`[ONBOARDING] Selar API Response (${endpoint}):`, JSON.stringify(data, null, 2));
                 const sales = data.data || [];
                 hasPurchased = sales.some(sale =>
                     (sale.product_name && sale.product_name.toLowerCase().includes('wealthy place')) ||
