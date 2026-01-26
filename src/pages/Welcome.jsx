@@ -52,7 +52,8 @@ const Welcome = () => {
                 setError(data.message || 'Verification failed');
             }
         } catch (err) {
-            setError('Connection error. Please try again.');
+            console.error('Registration error:', err);
+            setError(`Connection error (${err.message}). Is the server running?`);
         } finally {
             setLoading(false);
         }

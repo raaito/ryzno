@@ -15,8 +15,7 @@ const app = express();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
-    console.error('CRITICAL ERROR: JWT_SECRET not found in environment');
-    process.exit(1);
+    console.warn('WARNING: JWT_SECRET not found in environment. Auth will fail.');
 }
 
 // Secure Health Check (Internal Use Only)
@@ -34,13 +33,17 @@ connectDB();
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
+    'http://ryzno.test',
+    'http://ryzno.local',
     'https://ryzno.vercel.app',
-    'https://www.ryzno.com' // Adjust as needed
+    'https://www.ryzno.com'
 ];
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -48,6 +51,11 @@ app.use(cors({
     },
     credentials: true
 }));
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - Origin: ${req.headers.origin}`);
+    next();
+});
+
 app.use(express.json());
 
 // --- MIDDLEWARE ---
