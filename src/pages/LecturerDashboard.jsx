@@ -131,7 +131,7 @@ const LecturerDashboard = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     const inputStyle = { padding: '1rem', background: '#fff', border: '1px solid #ddd', borderRadius: '12px', outline: 'none', fontSize: '0.95rem' };

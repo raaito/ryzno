@@ -9,9 +9,16 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const { login, token } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+
+    // Redirect if already logged in
+    React.useEffect(() => {
+        if (token) {
+            navigate('/academy', { replace: true });
+        }
+    }, [token, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,7 +37,7 @@ const Login = () => {
             if (response.ok) {
                 login(data.user, data.token);
                 const origin = location.state?.from?.pathname || '/academy';
-                navigate(origin);
+                navigate(origin, { replace: true });
             } else {
                 setError(data.message || 'Login failed');
             }

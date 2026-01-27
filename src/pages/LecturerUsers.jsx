@@ -78,7 +78,7 @@ const LecturerUsers = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     const filteredUsers = users.filter(u => {

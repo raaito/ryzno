@@ -68,7 +68,7 @@ const Academy = () => {
 
     const handleLogout = () => {
         logout();
-        navigate('/login');
+        navigate('/login', { replace: true });
     };
 
     if (loading) return (
