@@ -93,7 +93,7 @@ const Restore = () => {
                                 <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>
                                     Restoration isn't just about going back to how things were; it's about being rebuilt into something stronger, more beautiful, and more resilient than before. Using the philosophy of Kintsugi as a spiritual metaphor, we help you find the gold in your brokenness.
                                 </p>
-                                <a href="#" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{
+                                <Link to="/restore/register" className="btn-primary" style={{
                                     padding: '1rem 3rem',
                                     background: 'var(--color-restore)',
                                     color: 'white',
@@ -102,7 +102,7 @@ const Restore = () => {
                                     border: '1px solid rgba(255,255,255,0.2)'
                                 }}>
                                     Book a Session
-                                </a>
+                                </Link>
                             </motion.div>
                         </div>
 

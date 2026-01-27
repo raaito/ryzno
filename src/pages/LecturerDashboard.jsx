@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, BookOpen, Plus, Send, Radio, Video, ArrowLeft, Edit3, Trash2, X, Folder, Layers, LogOut, Mail } from 'lucide-react';
+import { Upload, FileText, BookOpen, Plus, Send, Radio, Video, ArrowLeft, Edit3, Trash2, X, Folder, Layers, LogOut, Mail, Calendar, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -149,6 +149,12 @@ const LecturerDashboard = () => {
                         <button onClick={() => { setActiveTab('courses'); resetForms(); }} style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', border: 'none', background: activeTab === 'courses' ? '#000' : 'transparent', color: activeTab === 'courses' ? '#fff' : '#666', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>Courses</button>
                         <button onClick={() => { setActiveTab('sale'); resetForms(); }} style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', border: 'none', background: activeTab === 'sale' ? '#b8860b' : 'transparent', color: activeTab === 'sale' ? '#fff' : '#666', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>Sale</button>
                         <button onClick={() => { setActiveTab('ad'); resetForms(); }} style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', border: 'none', background: activeTab === 'ad' ? '#d97706' : 'transparent', color: activeTab === 'ad' ? '#fff' : '#666', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem' }}>Academy Ad</button>
+                        <Link to="/academy/lecturer/restore" style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', textDecoration: 'none', color: '#666', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Calendar size={14} /> Restore
+                        </Link>
+                        <Link to="/academy/lecturer/users" style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', textDecoration: 'none', color: '#666', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <User size={14} /> Users
+                        </Link>
                         <Link to="/academy/lecturer/messages" style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', textDecoration: 'none', color: '#666', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Mail size={14} /> Messages
                         </Link>

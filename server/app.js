@@ -8,6 +8,7 @@ import Course from './models/Course.js';
 import Lesson from './models/Lesson.js';
 import Setting from './models/Setting.js';
 import Contact from './models/Contact.js';
+import RestoreRegistration from './models/RestoreRegistration.js';
 
 import crypto from 'crypto';
 
@@ -442,6 +443,100 @@ app.post('/api/contact', async (req, res) => {
         res.status(201).json({ message: 'Message sent successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error sending message' });
+    }
+});
+
+app.post('/api/restore/register', async (req, res) => {
+    console.log('Incoming Restore registration:', req.body);
+    try {
+        const registration = await RestoreRegistration.create({
+            id: crypto.randomUUID(),
+            ...req.body
+        });
+        res.status(201).json({
+            success: true,
+            message: 'Registration submitted successfully!',
+            registrationId: registration.id
+        });
+    } catch (error) {
+        console.error('Restore Registration Error:', error);
+        res.status(500).json({ message: 'Error submitting registration' });
+    }
+});
+
+app.get('/api/restore/registrations', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    try {
+        const registrations = await RestoreRegistration.find({}).sort({ createdAt: -1 });
+        res.json(registrations);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching registrations' });
+    }
+});
+
+app.put('/api/restore/registrations/:id', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const registration = await RestoreRegistration.findOneAndUpdate({ id }, req.body, { new: true });
+        if (registration) {
+            res.json(registration);
+        } else {
+            res.status(404).json({ message: 'Registration not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating registration' });
+    }
+});
+
+app.delete('/api/restore/registrations/:id', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deleted = await RestoreRegistration.findOneAndDelete({ id });
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: 'Registration not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting registration' });
+    }
+});
+
+// --- USER MANAGEMENT ENDPOINTS ---
+app.get('/api/users', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    try {
+        const users = await User.find({}, '-password').sort({ fullName: 1 });
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+});
+
+app.put('/api/users/:id/role', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+    try {
+        const user = await User.findOneAndUpdate({ id }, { role }, { new: true });
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating user role' });
+    }
+});
+
+app.delete('/api/users/:id', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const deleted = await User.findOneAndDelete({ id });
+        if (deleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting user' });
     }
 });
 

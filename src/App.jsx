@@ -8,9 +8,12 @@ import Register from './pages/Register';
 import About from './pages/About';
 import Soar from './pages/Soar';
 import Restore from './pages/Restore';
+import RestoreRegistration from './pages/RestoreRegistration';
 import Roar from './pages/Roar';
 import Contact from './pages/Contact';
 import LecturerMessages from './pages/LecturerMessages';
+import LecturerRestore from './pages/LecturerRestore';
+import LecturerUsers from './pages/LecturerUsers';
 import Welcome from './pages/Welcome';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -27,6 +30,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/soar" element={<Soar />} />
           <Route path="/restore" element={<Restore />} />
+          <Route path="/restore/register" element={<RestoreRegistration />} />
           <Route path="/roar" element={<Roar />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/welcome" element={<Welcome />} />
@@ -55,6 +59,22 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['LECTURER']}>
                 <LecturerMessages />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academy/lecturer/restore"
+            element={
+              <ProtectedRoute allowedRoles={['LECTURER']}>
+                <LecturerRestore />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/academy/lecturer/users"
+            element={
+              <ProtectedRoute allowedRoles={['LECTURER']}>
+                <LecturerUsers />
               </ProtectedRoute>
             }
           />
