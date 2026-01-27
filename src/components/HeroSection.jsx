@@ -15,29 +15,41 @@ const HeroSection = () => {
             image: heroImg1,
             tag: "The Movement",
             title: "RYZNO",
-            subtitle: "Risen and Ordained. Systems of Accountability & divine Responsibility.",
-            color: "var(--color-soar)"
+            subtitle: "Risen and Ordained. Leading a generation of systems, accountability, and divine responsibility.",
+            color: "var(--color-soar)",
+            btnText: "Learn More",
+            path: "/about",
+            glow: "glow-soar"
         },
         {
             image: soarImg,
             tag: "The Academy",
             title: "S.O.A.R",
-            subtitle: "Cultivating leaders as Sentinels in a shifting culture.",
-            color: "var(--color-soar)"
+            subtitle: "Cultivating leaders as Sentinels in a shifting culture through rigorous spiritual and practical training.",
+            color: "var(--color-soar)",
+            btnText: "Explore SOAR",
+            path: "/soar",
+            glow: "glow-soar"
         },
         {
             image: restoreImg,
             tag: "The Healing",
             title: "RESTORE",
-            subtitle: "What was broken becomes the blueprint for your purpose.",
-            color: "var(--color-restore)"
+            subtitle: "Where what was broken becomes the architectural blueprint for your divine purpose and healing.",
+            color: "var(--color-restore)",
+            btnText: "Book Session",
+            path: "/restore",
+            glow: "glow-restore"
         },
         {
             image: roarImg,
             tag: "The Expression",
             title: "ROAR",
-            subtitle: "Unleashing the dimensions of the gift of God at work in you.",
-            color: "var(--color-roar)"
+            subtitle: "Unleashing the dimensions of the raw gifts of God at work in you through creative expression.",
+            color: "var(--color-roar)",
+            btnText: "Discover ROAR",
+            path: "/roar",
+            glow: "glow-roar"
         }
     ];
 
@@ -178,19 +190,20 @@ const HeroSection = () => {
                             <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                className="glow-soar" style={{
+                                className={slides[currentSlide].glow} style={{
                                     padding: '1rem 2rem',
                                     borderRadius: '50px',
                                     fontSize: '0.95rem',
                                     fontWeight: 800,
-                                    background: 'var(--color-soar)',
+                                    background: slides[currentSlide].color,
                                     color: 'white',
                                     border: 'none',
                                     cursor: 'pointer',
-                                    boxShadow: '0 10px 30px rgba(245, 158, 11, 0.25)',
-                                    minWidth: '160px'
-                                }} onClick={() => navigate('/academy')}>
-                                Explore Academy
+                                    boxShadow: `0 10px 30px ${slides[currentSlide].color}44`,
+                                    minWidth: '180px',
+                                    transition: 'all 0.3s ease'
+                                }} onClick={() => navigate(slides[currentSlide].path)}>
+                                {slides[currentSlide].btnText}
                             </motion.button>
                             <motion.button
                                 whileHover={{ scale: 1.05, background: 'rgba(0,0,0,0.05)' }}
@@ -246,7 +259,7 @@ const HeroSection = () => {
                             width: currentSlide === i ? '30px' : '8px',
                             height: '8px',
                             borderRadius: '100px',
-                            background: currentSlide === i ? 'var(--color-soar)' : 'rgba(0,0,0,0.2)',
+                            background: currentSlide === i ? slides[currentSlide].color : 'rgba(0,0,0,0.1)',
                             transition: 'all 0.4s ease',
                             cursor: 'pointer'
                         }}></div>
