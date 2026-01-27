@@ -4,7 +4,6 @@ import { ArrowLeft, Heart, RefreshCw, Zap, Sparkles, Shield, Compass, Star } fro
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import PillarContact from '../components/PillarContact';
 import restoreImg from '../assets/restore.png';
 
 const Restore = () => {
@@ -142,7 +141,22 @@ const Restore = () => {
                             </div>
                         </div>
 
-                        <PillarContact source="RESTORE" color="var(--color-restore)" title="Book a Restoration Session" />
+
+                        <div style={{ marginTop: '8rem', textAlign: 'center' }}>
+                            <Link to="/restore/register" className="btn-primary" style={{
+                                padding: '1.5rem 4rem',
+                                background: 'var(--color-restore)',
+                                color: 'white',
+                                textDecoration: 'none',
+                                fontSize: '1.2rem',
+                                fontWeight: 800,
+                                borderRadius: '50px',
+                                boxShadow: '0 10px 30px rgba(239, 68, 68, 0.3)',
+                                display: 'inline-block'
+                            }}>
+                                Start Your Journey Now
+                            </Link>
+                        </div>
                     </div>
                 </section>
             </main>
