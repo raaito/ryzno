@@ -23,7 +23,7 @@ const RestoreForm = () => {
         otherConcern: '',
         mostPressingIssue: '',
         duration: '',
-        previousSupport: false,
+        previousSupport: null,
         supportDetails: '',
         story: '',
         consentToShare: false,
@@ -33,6 +33,7 @@ const RestoreForm = () => {
         feeAgreement: false,
         proofOfPayment: null
     });
+    const [attemptedNext, setAttemptedNext] = useState(false);
 
     const steps = [
         { id: 1, title: 'Identity', icon: <User size={20} /> },
@@ -64,7 +65,7 @@ const RestoreForm = () => {
             case 3:
                 return (
                     formData.story &&
-                    (formData.previousSupport === true || formData.previousSupport === false)
+                    formData.previousSupport !== null
                 );
             case 4:
                 return (
@@ -84,6 +85,10 @@ const RestoreForm = () => {
     const handleNext = () => {
         if (isStepValid()) {
             setStep(s => Math.min(s + 1, 6));
+            setAttemptedNext(false);
+            window.scrollTo(0, 0);
+        } else {
+            setAttemptedNext(true);
         }
     };
 
@@ -100,8 +105,12 @@ const RestoreForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!isStepValid()) return;
+        if (!isStepValid()) {
+            setAttemptedNext(true);
+            return;
+        }
         setLoading(true);
+        setAttemptedNext(false);
         setStatus('idle');
 
         try {
@@ -136,6 +145,16 @@ const RestoreForm = () => {
         width: '100%',
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)'
+    };
+
+    const getFieldStyle = (value, isRequired = true) => {
+        const isInvalid = attemptedNext && isRequired && !value;
+        return {
+            ...inputStyle,
+            borderColor: isInvalid ? '#ef4444' : 'rgba(0,0,0,0.05)',
+            background: isInvalid ? 'rgba(239, 68, 68, 0.05)' : 'rgba(255,255,255,0.8)',
+            borderWidth: isInvalid ? '2px' : '1px'
+        };
     };
 
     const labelStyle = {
@@ -173,14 +192,20 @@ const RestoreForm = () => {
                         <h2 style={sectionTitleStyle} className="restore-section-title">About You</h2>
                         <p style={sectionDescStyle}>In order to help you better, we will need these details from you.</p>
 
-                        <div style={{ background: 'rgba(239, 68, 68, 0.05)', padding: '1.5rem', borderRadius: '24px', marginBottom: '2.5rem', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
+                        <div className="consent-box" style={{
+                            background: (attemptedNext && !formData.consentToShare) ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)',
+                            padding: '1.5rem',
+                            borderRadius: '24px',
+                            marginBottom: '2.5rem',
+                            border: `2px solid ${(attemptedNext && !formData.consentToShare) ? '#ef4444' : 'rgba(239, 68, 68, 0.1)'}`,
+                            transition: 'all 0.3s'
+                        }}>
                             <label style={{ ...labelStyle, textTransform: 'none', opacity: 1, fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
                                 <input
                                     type="checkbox"
                                     checked={formData.consentToShare}
                                     onChange={e => setFormData({ ...formData, consentToShare: e.target.checked })}
                                     style={{ width: '22px', height: '22px', cursor: 'pointer' }}
-                                    required
                                 />
                                 Do you consent to share this information for counselling purposes? *
                             </label>
@@ -190,67 +215,61 @@ const RestoreForm = () => {
                             <div>
                                 <label style={labelStyle}>First Name *</label>
                                 <input
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.firstName)}
                                     className="restore-input"
                                     placeholder="Enter your first name"
                                     value={formData.firstName}
                                     onChange={e => setFormData({ ...formData, firstName: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Surname *</label>
                                 <input
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.surname)}
                                     className="restore-input"
                                     placeholder="Enter your surname"
                                     value={formData.surname}
                                     onChange={e => setFormData({ ...formData, surname: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div style={{ gridColumn: 'span 2' }}>
                                 <label style={labelStyle}>Email Address *</label>
                                 <input
                                     type="email"
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.email)}
                                     className="restore-input"
                                     placeholder="you@example.com"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Phone Number *</label>
                                 <input
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.phoneNumber)}
                                     className="restore-input"
                                     placeholder="e.g. +234..."
                                     value={formData.phoneNumber}
                                     onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Occupation *</label>
                                 <input
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.occupation)}
                                     className="restore-input"
                                     placeholder="Your current role"
                                     value={formData.occupation}
                                     onChange={e => setFormData({ ...formData, occupation: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Age Range *</label>
                                 <select
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.ageRange)}
                                     className="restore-input"
                                     value={formData.ageRange}
                                     onChange={e => setFormData({ ...formData, ageRange: e.target.value })}
-                                    required
                                 >
                                     <option value="">Select Age</option>
                                     <option value="18 - 24">18 - 24</option>
@@ -261,7 +280,14 @@ const RestoreForm = () => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Gender *</label>
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '1rem',
+                                    marginTop: '0.5rem',
+                                    padding: (attemptedNext && !formData.gender) ? '4px' : '0',
+                                    borderRadius: '24px',
+                                    border: (attemptedNext && !formData.gender) ? '2px solid #ef4444' : 'none'
+                                }}>
                                     {['Male', 'Female'].map(g => (
                                         <label key={g} style={{
                                             flex: 1,
@@ -273,7 +299,7 @@ const RestoreForm = () => {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             cursor: 'pointer',
-                                            border: '1px solid rgba(0,0,0,0.05)',
+                                            border: formData.gender === g ? '1px solid transparent' : '1px solid rgba(0,0,0,0.05)',
                                             transition: 'all 0.3s'
                                         }}>
                                             <input
@@ -313,7 +339,15 @@ const RestoreForm = () => {
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                         <h2 style={sectionTitleStyle} className="restore-section-title">Primary Area(s) of Concern</h2>
                         <p style={sectionDescStyle}>Select all that apply. These help us identify your challenges.</p>
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }} className="restore-grid-2">
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            gap: '1rem',
+                            marginBottom: '2rem',
+                            padding: (attemptedNext && formData.concerns.length === 0) ? '8px' : '0',
+                            borderRadius: '24px',
+                            border: (attemptedNext && formData.concerns.length === 0) ? '2px solid #ef4444' : 'none'
+                        }} className="restore-grid-2">
                             {concernOptions.map(opt => (
                                 <button
                                     key={opt}
@@ -340,10 +374,9 @@ const RestoreForm = () => {
                             <div>
                                 <label style={labelStyle}>Which of the selected issues affects you the most right now? *</label>
                                 <select
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.mostPressingIssue)}
                                     value={formData.mostPressingIssue}
                                     onChange={e => setFormData({ ...formData, mostPressingIssue: e.target.value })}
-                                    required
                                 >
                                     <option value="">Select the main issue</option>
                                     {formData.concerns.map(c => <option key={c} value={c}>{c}</option>)}
@@ -353,10 +386,9 @@ const RestoreForm = () => {
                             <div>
                                 <label style={labelStyle}>How long have you been dealing with this issue? *</label>
                                 <select
-                                    style={inputStyle}
+                                    style={getFieldStyle(formData.duration)}
                                     value={formData.duration}
                                     onChange={e => setFormData({ ...formData, duration: e.target.value })}
-                                    required
                                 >
                                     <option value="">Select Duration</option>
                                     <option value="Less than 6 months">Less than 6 months</option>
@@ -377,17 +409,28 @@ const RestoreForm = () => {
                             <div>
                                 <label style={labelStyle}>Please briefly describe what you are experiencing *</label>
                                 <textarea
-                                    style={{ ...inputStyle, borderRadius: '32px', resize: 'none' }}
+                                    style={{
+                                        ...getFieldStyle(formData.story),
+                                        borderRadius: '32px',
+                                        resize: 'none',
+                                        minHeight: '150px'
+                                    }}
                                     rows="6"
                                     placeholder="Write your story here..."
                                     value={formData.story}
                                     onChange={e => setFormData({ ...formData, story: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Have you received support before? *</label>
-                                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '1rem',
+                                    marginTop: '0.5rem',
+                                    padding: (attemptedNext && formData.previousSupport === null) ? '4px' : '0',
+                                    borderRadius: '24px',
+                                    border: (attemptedNext && formData.previousSupport === null) ? '2px solid #ef4444' : 'none'
+                                }}>
                                     {[true, false].map(val => (
                                         <label key={val.toString()} style={{
                                             flex: 1,
@@ -399,7 +442,7 @@ const RestoreForm = () => {
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             cursor: 'pointer',
-                                            border: '1px solid rgba(0,0,0,0.05)',
+                                            border: formData.previousSupport === val ? '1px solid transparent' : '1px solid rgba(0,0,0,0.05)',
                                             transition: 'all 0.3s'
                                         }}>
                                             <input
@@ -437,17 +480,23 @@ const RestoreForm = () => {
                             <div>
                                 <label style={labelStyle}>What are you hoping to gain? *</label>
                                 <textarea
-                                    style={{ ...inputStyle, borderRadius: '32px', resize: 'none' }}
+                                    style={{ ...getFieldStyle(formData.expectations), borderRadius: '32px', resize: 'none' }}
                                     rows="4"
                                     placeholder="Clarity, healing, direction, or support?"
                                     value={formData.expectations}
                                     onChange={e => setFormData({ ...formData, expectations: e.target.value })}
-                                    required
                                 />
                             </div>
                             <div>
                                 <label style={labelStyle}>Preferred Session Time (Wednesdays) *</label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }} className="restore-grid-2">
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    gap: '1rem',
+                                    padding: (attemptedNext && !formData.preferredTime) ? '8px' : '0',
+                                    borderRadius: '32px',
+                                    border: (attemptedNext && !formData.preferredTime) ? '2px solid #ef4444' : 'none'
+                                }} className="restore-grid-2">
                                     {[
                                         "6.00 PM - 7.00 PM",
                                         "7.15 PM - 8.15 PM",
@@ -463,7 +512,7 @@ const RestoreForm = () => {
                                                 borderRadius: '24px',
                                                 background: formData.preferredTime === time ? '#000' : '#fff',
                                                 color: formData.preferredTime === time ? '#fff' : '#000',
-                                                border: '1px solid rgba(0,0,0,0.05)',
+                                                border: formData.preferredTime === time ? '1px solid transparent' : '1px solid rgba(0,0,0,0.05)',
                                                 fontWeight: 800,
                                                 fontSize: '0.9rem',
                                                 cursor: 'pointer',
@@ -506,22 +555,37 @@ const RestoreForm = () => {
                             </p>
                         </div>
                         <div style={{ display: 'grid', gap: '2rem' }}>
-                            <label style={{ ...labelStyle, textTransform: 'none', opacity: 1, fontSize: '1.1rem', fontWeight: 800, marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1.5rem', cursor: 'pointer', background: '#fff', padding: '1.5rem', borderRadius: '24px', border: `2px solid ${formData.feeAgreement ? 'var(--color-restore)' : '#eee'}` }}>
+                            <label style={{
+                                ...labelStyle,
+                                textTransform: 'none',
+                                opacity: 1,
+                                fontSize: '1.1rem',
+                                fontWeight: 800,
+                                marginBottom: '2rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1.5rem',
+                                cursor: 'pointer',
+                                background: '#fff',
+                                padding: '1.5rem',
+                                borderRadius: '24px',
+                                border: (attemptedNext && !formData.feeAgreement) ? '2px solid #ef4444' : `2px solid ${formData.feeAgreement ? 'var(--color-restore)' : '#eee'}`,
+                                transition: 'all 0.3s'
+                            }}>
                                 <input
                                     type="checkbox"
                                     checked={formData.feeAgreement}
                                     onChange={e => setFormData({ ...formData, feeAgreement: e.target.checked })}
                                     style={{ width: '24px', height: '24px' }}
-                                    required
                                 />
                                 Are you willing to pay the commitment fee per session? *
                             </label>
 
                             {formData.feeAgreement && (
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'grid', gap: '2rem' }}>
-                                    <div style={{ background: '#f8f9fa', padding: '2.5rem', borderRadius: '32px', border: '1px solid #eee' }}>
+                                    <div style={{ background: '#f8f9fa', padding: '2.5rem', borderRadius: '32px', border: '1px solid #eee' }} className="payment-details-container">
                                         <h3 style={{ fontSize: '1.1rem', fontWeight: 900, marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Payment Details</h3>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }} className="restore-grid-2">
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }} className="payment-details-grid">
                                             <div>
                                                 <p style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--color-restore)', marginBottom: '0.5rem' }}>NIGERIAN ACCOUNT</p>
                                                 <p style={{ fontWeight: 800, fontSize: '1.1rem' }}>Zenith Bank</p>
@@ -542,7 +606,7 @@ const RestoreForm = () => {
                                             padding: '3rem',
                                             background: '#fff',
                                             borderRadius: '32px',
-                                            border: '2px dashed #eee',
+                                            border: (attemptedNext && !formData.proofOfPayment) ? '2px dashed #ef4444' : '2px dashed #eee',
                                             textAlign: 'center',
                                             cursor: 'pointer',
                                             transition: 'all 0.3s'
@@ -554,8 +618,8 @@ const RestoreForm = () => {
                                                 style={{ display: 'none' }}
                                                 onChange={e => setFormData({ ...formData, proofOfPayment: e.target.files[0] ? e.target.files[0].name : null })}
                                             />
-                                            <Upload style={{ margin: '0 auto 1.5rem auto', color: 'var(--color-restore)' }} size={48} />
-                                            <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+                                            <Upload style={{ margin: '0 auto 1.5rem auto', color: (attemptedNext && !formData.proofOfPayment) ? '#ef4444' : 'var(--color-restore)' }} size={48} />
+                                            <p style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem', color: (attemptedNext && !formData.proofOfPayment) ? '#ef4444' : '#000' }}>
                                                 {formData.proofOfPayment ? formData.proofOfPayment : 'Click to upload proof'}
                                             </p>
                                             <p style={{ fontSize: '0.85rem', opacity: 0.5 }}>Image formats only. Max 10 MB.</p>
@@ -664,10 +728,11 @@ const RestoreForm = () => {
                         </button>
 
                         {step < 5 ? (
-                            <button
+                            <motion.button
                                 type="button"
                                 onClick={handleNext}
-                                disabled={!isCurrentStepValid}
+                                animate={attemptedNext && !isCurrentStepValid ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+                                transition={{ duration: 0.4 }}
                                 style={{
                                     padding: '1.2rem 3rem',
                                     background: isCurrentStepValid ? 'var(--color-restore)' : '#eee',
@@ -678,7 +743,7 @@ const RestoreForm = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.75rem',
-                                    cursor: isCurrentStepValid ? 'pointer' : 'not-allowed',
+                                    cursor: 'pointer',
                                     boxShadow: isCurrentStepValid ? '0 15px 30px rgba(239, 68, 68, 0.3)' : 'none',
                                     transition: 'all 0.3s'
                                 }}
@@ -686,11 +751,13 @@ const RestoreForm = () => {
                                 onMouseLeave={e => isCurrentStepValid && (e.target.style.transform = 'translateY(0)')}
                             >
                                 Continue <ArrowRight size={18} />
-                            </button>
+                            </motion.button>
                         ) : (
-                            <button
+                            <motion.button
                                 type="submit"
-                                disabled={loading || !isCurrentStepValid}
+                                disabled={loading}
+                                animate={attemptedNext && !isCurrentStepValid ? { x: [0, -10, 10, -10, 10, 0] } : {}}
+                                transition={{ duration: 0.4 }}
                                 style={{
                                     padding: '1.2rem 3rem',
                                     background: isCurrentStepValid ? '#000' : '#eee',
@@ -702,13 +769,13 @@ const RestoreForm = () => {
                                     alignItems: 'center',
                                     gap: '0.75rem',
                                     opacity: loading ? 0.7 : 1,
-                                    cursor: (loading || !isCurrentStepValid) ? 'not-allowed' : 'pointer',
+                                    cursor: loading ? 'not-allowed' : 'pointer',
                                     boxShadow: isCurrentStepValid ? '0 15px 30px rgba(0,0,0,0.1)' : 'none',
                                     transition: 'all 0.3s'
                                 }}
                             >
                                 {loading ? 'Submitting...' : 'Complete Registration'} <CheckCircle size={18} />
-                            </button>
+                            </motion.button>
                         )}
                     </div>
                 )}
@@ -725,11 +792,34 @@ const RestoreForm = () => {
                 select.restore-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1.5rem center; background-size: 1.2rem; }
 
                 @media (max-width: 768px) {
-                    .restore-grid-2 { grid-template-columns: 1fr !important; }
+                    .restore-grid-2 { grid-template-columns: 1fr !important; gap: 1rem !important; }
                     .restore-form-container { padding: 1rem !important; }
+                    .restore-section-title { font-size: 1.8rem !important; }
+                    .restore-footer { flex-direction: column-reverse !important; gap: 1rem !important; padding: 2rem 0 !important; }
+                    .restore-footer button { width: 100% !important; justify-content: center !important; padding: 1.2rem !important; }
+                    
+                    /* Progress Bar Mobile Optimizations */
+                    .restore-progress-bar { 
+                        gap: 1.5rem !important; 
+                        margin-bottom: 2.5rem !important;
+                        padding-bottom: 1rem !important;
+                    }
+                    
+                    /* Step Content Spacing */
+                    .restore-input { padding: 1rem 1.25rem !important; font-size: 0.95rem !important; }
+                    
+                    /* Payment Details Stack */
+                    .payment-details-container { padding: 1.5rem !important; }
+                    .payment-details-grid { grid-template-columns: 1fr !important; gap: 1.5rem !important; text-align: left !important; }
+                    
+                    /* Consent Box Spacing */
+                    .consent-box { padding: 1rem !important; }
+                    .consent-box label { gap: 0.5rem !important; font-size: 0.9rem !important; }
+                }
+
+                @media (max-width: 480px) {
                     .restore-section-title { font-size: 1.5rem !important; }
-                    .restore-footer { flex-direction: column; gap: 1rem; }
-                    .restore-footer button { width: 100%; justify-content: center; }
+                    .restore-progress-bar span { font-size: 0.65rem !important; }
                 }
             `}} />
         </div>
