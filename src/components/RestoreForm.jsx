@@ -211,7 +211,7 @@ const RestoreForm = () => {
                             </label>
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }} className="restore-grid-2">
+                        <div className="restore-grid-2">
                             <div>
                                 <label style={labelStyle}>First Name *</label>
                                 <input
@@ -232,7 +232,7 @@ const RestoreForm = () => {
                                     onChange={e => setFormData({ ...formData, surname: e.target.value })}
                                 />
                             </div>
-                            <div style={{ gridColumn: 'span 2' }}>
+                            <div className="full-width">
                                 <label style={labelStyle}>Email Address *</label>
                                 <input
                                     type="email"
@@ -280,10 +280,7 @@ const RestoreForm = () => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Gender *</label>
-                                <div style={{
-                                    display: 'flex',
-                                    gap: '1rem',
-                                    marginTop: '0.5rem',
+                                <div className="gender-container" style={{
                                     padding: (attemptedNext && !formData.gender) ? '4px' : '0',
                                     borderRadius: '24px',
                                     border: (attemptedNext && !formData.gender) ? '2px solid #ef4444' : 'none'
@@ -339,31 +336,26 @@ const RestoreForm = () => {
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                         <h2 style={sectionTitleStyle} className="restore-section-title">Primary Area(s) of Concern</h2>
                         <p style={sectionDescStyle}>Select all that apply. These help us identify your challenges.</p>
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: '1fr 1fr',
-                            gap: '1rem',
-                            marginBottom: '2rem',
+                        <div className="restore-grid-2 concerns-grid" style={{
                             padding: (attemptedNext && formData.concerns.length === 0) ? '8px' : '0',
                             borderRadius: '24px',
                             border: (attemptedNext && formData.concerns.length === 0) ? '2px solid #ef4444' : 'none'
-                        }} className="restore-grid-2">
+                        }}>
                             {concernOptions.map(opt => (
                                 <button
                                     key={opt}
                                     type="button"
                                     onClick={() => handleCheckboxChange(opt)}
+                                    className={`concern-opt ${formData.concerns.includes(opt) ? 'active' : ''}`}
                                     style={{
                                         textAlign: 'left',
                                         padding: '1.2rem',
                                         borderRadius: '20px',
-                                        background: formData.concerns.includes(opt) ? 'rgba(239, 68, 68, 0.1)' : '#fff',
-                                        border: `2px solid ${formData.concerns.includes(opt) ? 'var(--color-restore)' : 'transparent'}`,
-                                        color: formData.concerns.includes(opt) ? 'var(--color-restore)' : '#1a1a1a',
                                         fontSize: '0.9rem',
                                         fontWeight: 600,
                                         cursor: 'pointer',
-                                        transition: 'all 0.2s'
+                                        transition: 'all 0.2s',
+                                        border: '2px solid transparent'
                                     }}
                                 >
                                     {opt}
@@ -489,14 +481,11 @@ const RestoreForm = () => {
                             </div>
                             <div>
                                 <label style={labelStyle}>Preferred Session Time (Wednesdays) *</label>
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: '1fr 1fr',
-                                    gap: '1rem',
+                                <div className="restore-grid-2" style={{
                                     padding: (attemptedNext && !formData.preferredTime) ? '8px' : '0',
                                     borderRadius: '32px',
                                     border: (attemptedNext && !formData.preferredTime) ? '2px solid #ef4444' : 'none'
-                                }} className="restore-grid-2">
+                                }}>
                                     {[
                                         "6.00 PM - 7.00 PM",
                                         "7.15 PM - 8.15 PM",
@@ -791,8 +780,23 @@ const RestoreForm = () => {
                 .restore-input::placeholder { opacity: 0.3; }
                 select.restore-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1.5rem center; background-size: 1.2rem; }
 
+                .restore-grid-2 {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1.5rem;
+                }
+                .full-width { grid-column: span 2; }
+                
+                .concern-opt { background: #fff; color: #1a1a1a; }
+                .concern-opt.active { background: rgba(239, 68, 68, 0.1); border-color: var(--color-restore) !important; color: var(--color-restore); }
+
+                .gender-container { display: flex; gap: 1rem; margin-top: 0.5rem; }
+
                 @media (max-width: 768px) {
                     .restore-grid-2 { grid-template-columns: 1fr !important; gap: 1rem !important; }
+                    .full-width { grid-column: auto !important; }
+                    .gender-container { flex-direction: column !important; }
+                    
                     .restore-form-container { padding: 1rem !important; }
                     .restore-section-title { font-size: 1.8rem !important; }
                     .restore-footer { flex-direction: column-reverse !important; gap: 1rem !important; padding: 2rem 0 !important; }
@@ -803,10 +807,13 @@ const RestoreForm = () => {
                         gap: 1.5rem !important; 
                         margin-bottom: 2.5rem !important;
                         padding-bottom: 1rem !important;
+                        overflow-x: auto !important;
+                        justify-content: flex-start !important;
                     }
+                    .restore-progress-bar > div { flex-shrink: 0 !important; }
                     
                     /* Step Content Spacing */
-                    .restore-input { padding: 1rem 1.25rem !important; font-size: 0.95rem !important; }
+                    .restore-input { padding: 1rem 1.25rem !important; font-size: 16px !important; } /* 16px prevents zoom on iOS */
                     
                     /* Payment Details Stack */
                     .payment-details-container { padding: 1.5rem !important; }
@@ -814,7 +821,8 @@ const RestoreForm = () => {
                     
                     /* Consent Box Spacing */
                     .consent-box { padding: 1rem !important; }
-                    .consent-box label { gap: 0.5rem !important; font-size: 0.9rem !important; }
+                    .consent-box label { gap: 0.75rem !important; font-size: 0.9rem !important; align-items: flex-start !important; }
+                    .consent-box input { margin-top: 0.2rem !important; }
                 }
 
                 @media (max-width: 480px) {

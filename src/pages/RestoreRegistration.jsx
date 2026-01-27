@@ -67,8 +67,11 @@ const RestoreRegistration = () => {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 .back-link:hover { color: var(--color-restore) !important; }
+                .back-link:hover { color: var(--color-restore) !important; }
                 @media (max-width: 768px) {
-                    .container { padding: 0 1.5rem; }
+                    .container { padding: 0 1rem; }
+                    main { paddingTop: 80px !important; paddingBottom: 60px !important; }
+                    .back-link { margin-bottom: 1rem !important; }
                 }
             `}} />
         </div>
