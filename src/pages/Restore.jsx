@@ -141,6 +141,32 @@ const Restore = () => {
                             </div>
                         </div>
 
+                        <div style={{ marginTop: '8rem', textAlign: 'center' }}>
+                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '2rem' }}>Dreams & Nightmares</h2>
+                            <p style={{ color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 4rem auto', fontSize: '1.2rem', lineHeight: 1.6 }}>
+                                We offer specialized consultation for understanding the subconcious realm. Your dreams are often the language of your spirit, and we help you decode them to find peace and direction.
+                            </p>
+
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', textAlign: 'left' }}>
+                                {[
+                                    { title: 'Spiritual Discernment', desc: 'Understanding the source and message of your dreams.' },
+                                    { title: 'Nightmare Resolution', desc: 'Breaking the cycle of recurring fears and nocturnal oppression.' },
+                                    { title: 'Visionary Clarity', desc: 'Aligning subconscious revelations with divine purpose.' },
+                                    { title: 'Inner Healing', desc: 'Using dreams as a tool for emotional and spiritual restoration.' }
+                                ].map((item, i) => (
+                                    <motion.div
+                                        key={i}
+                                        whileHover={{ y: -5 }}
+                                        className="glass"
+                                        style={{ padding: '2rem', borderRadius: '24px', border: '1px solid rgba(239, 68, 68, 0.1)' }}
+                                    >
+                                        <h4 style={{ fontSize: '1.2rem', fontWeight: 800, marginBottom: '0.75rem', color: 'var(--color-restore)' }}>{item.title}</h4>
+                                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>{item.desc}</p>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+
 
                         <div style={{ marginTop: '8rem', textAlign: 'center' }}>
                             <Link to="/restore/register" className="btn-primary" style={{
