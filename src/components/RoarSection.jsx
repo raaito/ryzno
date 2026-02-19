@@ -19,7 +19,7 @@ const RoarSection = () => {
                         <h2 style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '1.5rem', color: 'var(--color-roar)', fontWeight: 800 }}>
                             STUDIOS
                         </h2>
-                        <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>SOAR for Ryzno Studios</h3>
+                        <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>ROAR for Ryzno Studios</h3>
                         <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '2.5rem' }}>
                             The expressive dimension of the gift of God at work in you. We empower you to find your voice and release your unique sound into the world.
                         </p>

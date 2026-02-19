@@ -57,7 +57,7 @@ const Roar = () => {
                                 transition={{ duration: 0.8 }}
                             >
                                 <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-roar)', lineHeight: 1 }}>
-                                    SOAR for Ryzno Studios
+                                    ROAR for Ryzno Studios
                                 </h1>
                                 <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem' }}>
                                     The expressive dimension of the gift of God at work in us. Discovering and working in your divine gifts.
