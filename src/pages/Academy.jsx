@@ -97,7 +97,7 @@ const Academy = () => {
                         <img src={logo} alt="RYZNO" style={{ height: '32px', objectFit: 'contain' }} />
                     </Link>
                     <div style={{ width: '1px', height: '20px', background: 'rgba(0,0,0,0.1)' }} className="nav-divider"></div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-soar)', letterSpacing: '1px' }} className="nav-academy-text">S.O.A.R ACADEMY</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-soar)', letterSpacing: '1px' }} className="nav-academy-text">SOAR for Ryzno Academy</span>
                 </div>
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#666', fontSize: '0.85rem', fontWeight: 700 }} className="nav-user">

@@ -35,7 +35,7 @@ const Soar = () => {
     ];
 
     const faqs = [
-        { q: "What is the SOAR Academy?", a: "SOAR is our elite training program designed to cultivate individuals who embody authenticity and moral authority. It focuses on spiritual grounding and cultural relevance." },
+        { q: "What is the Academy?", a: "SOAR for Ryzno Academy is our elite training program designed to cultivate individuals who embody authenticity and moral authority. It focuses on spiritual grounding and cultural relevance." },
         { q: "How do I get access to the Academy?", a: "Access is granted through an inquiry process. Start by filling out the contact form below or clicking 'Register Now' to express your interest." },
         { q: "What are the requirements for enrollment?", a: "We look for a commitment to personal growth, accountability, and a willingness to engage in deep spiritual and practical training." },
         { q: "Is there a cost for the program?", a: "Specific program costs and scholarship opportunities are shared with applicants during the initial discovery phase." }
@@ -67,8 +67,8 @@ const Soar = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8 }}
                             >
-                                <h1 style={{ fontSize: 'clamp(3rem, 10vw, 5rem)', color: 'var(--color-soar)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1 }}>
-                                    S.O.A.R
+                                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', color: 'var(--color-soar)', fontWeight: 800, marginBottom: '1.5rem', lineHeight: 1 }}>
+                                    SOAR for Ryzno Academy
                                 </h1>
                                 <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>
                                     We cultivate individuals who embody authenticity and moral authority—people who are as spiritually grounded as they are culturally relevant.
@@ -160,7 +160,7 @@ const Soar = () => {
 
 
                         <div className="glass" style={{ padding: '4rem 2rem', textAlign: 'center', marginTop: '4rem' }}>
-                            <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Ready to Soar?</h2>
+                            <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Ready to Join the Academy?</h2>
                             <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem' }}>
                                 Join our community of Watchers, Guardians, and Mystics today.
                             </p>

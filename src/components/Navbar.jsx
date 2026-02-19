@@ -14,9 +14,9 @@ const Navbar = () => {
   const navLinks = [
     { name: 'HOME', href: '/', isHash: false },
     { name: 'ABOUT', href: '/about', isHash: false },
-    { name: 'SOAR', href: '/soar', isHash: false },
-    { name: 'RESTORE', href: '/restore', isHash: false },
-    { name: 'ROAR', href: '/roar', isHash: false },
+    { name: 'ACADEMY', href: '/soar', isHash: false },
+    { name: 'RENOVATION', href: '/restore', isHash: false },
+    { name: 'STUDIOS', href: '/roar', isHash: false },
   ];
 
   const handleNavClick = (e, link) => {

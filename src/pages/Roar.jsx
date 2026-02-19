@@ -56,8 +56,8 @@ const Roar = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8 }}
                             >
-                                <h1 style={{ fontSize: 'clamp(3rem, 10vw, 5rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-roar)', lineHeight: 1 }}>
-                                    ROAR
+                                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-roar)', lineHeight: 1 }}>
+                                    SOAR for Ryzno Studios
                                 </h1>
                                 <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2.5rem' }}>
                                     The expressive dimension of the gift of God at work in us. Discovering and working in your divine gifts.
@@ -130,7 +130,7 @@ const Roar = () => {
                             ))}
                         </div>
 
-                        <PillarContact source="ROAR" color="var(--color-roar)" title="Partner with ROAR" />
+                        <PillarContact source="STUDIOS" color="var(--color-roar)" title="Partner with STUDIOS" />
 
                         <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
                             <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '2rem' }}>Speak Your Truth</h2>

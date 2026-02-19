@@ -17,11 +17,11 @@ const RoarSection = () => {
                         transition={{ duration: 0.8 }}
                     >
                         <h2 style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '1.5rem', color: 'var(--color-roar)', fontWeight: 800 }}>
-                            ROAR
+                            STUDIOS
                         </h2>
-                        <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>The Voice of Authority</h3>
+                        <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>SOAR for Ryzno Studios</h3>
                         <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '2.5rem' }}>
-                            Discover the expressive dimension of the gift of God at work in you. We empower you to find your voice and release your unique sound into the world.
+                            The expressive dimension of the gift of God at work in you. We empower you to find your voice and release your unique sound into the world.
                         </p>
 
                         <div className="glass" style={{ padding: '2rem', marginBottom: '2.5rem', borderLeft: '4px solid var(--color-roar)' }}>
@@ -45,7 +45,7 @@ const RoarSection = () => {
                         </div>
 
                         <Link to="/roar" className="btn-primary" style={{ background: 'var(--color-roar)', borderColor: 'var(--color-roar)', color: '#fff' }}>
-                            Unleash Your Roar
+                            Explore Studios
                         </Link>
                     </motion.div>
 

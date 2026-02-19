@@ -83,8 +83,8 @@ const Restore = () => {
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.8 }}
                             >
-                                <h1 style={{ fontSize: 'clamp(3rem, 10vw, 5rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-restore)' }}>
-                                    RESTORE
+                                <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-restore)' }}>
+                                    RESTORE for Ryznovation
                                 </h1>
                                 <p style={{ fontSize: 'clamp(1.1rem, 4vw, 1.4rem)', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '2rem' }}>
                                     Helping people let go of the weight of the world. We offer consultation sessions to help you transition from trauma into divine purpose.

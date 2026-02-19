@@ -62,8 +62,9 @@ const RestoreSection = () => {
                             transition={{ duration: 0.8 }}
                         >
                             <h2 style={{ fontSize: 'clamp(2.5rem, 8vw, 3.5rem)', marginBottom: '1.5rem', lineHeight: 1.1, fontWeight: 800 }}>
-                                RESTORE
+                                RENOVATION
                             </h2>
+                            <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>RESTORE for Ryznovation</h3>
                             <p style={{ fontSize: 'clamp(1rem, 4vw, 1.25rem)', color: 'var(--text-secondary)', marginBottom: '2.5rem' }}>
                                 Helping people let go of the weight of the world. We offer consultation sessions to help you transition from trauma into divine purpose.
                             </p>
@@ -83,7 +84,7 @@ const RestoreSection = () => {
                             </div>
 
                             <Link to="/restore" className="btn-primary" style={{ background: 'var(--color-restore)', borderColor: 'var(--color-restore)' }}>
-                                Learn About Restoration
+                                Learn About Renovation
                             </Link>
                         </motion.div>
                     </div>
