@@ -142,9 +142,9 @@ const Restore = () => {
                         </div>
 
                         <div style={{ marginTop: '8rem', textAlign: 'center' }}>
-                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '2rem' }}>Dreams & Nightmares</h2>
+                            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '2rem' }}>The Subconscious Interior</h2>
                             <p style={{ color: 'var(--text-secondary)', maxWidth: '800px', margin: '0 auto 4rem auto', fontSize: '1.2rem', lineHeight: 1.6 }}>
-                                We offer specialized consultation for understanding the subconcious realm. Your dreams are often the language of your spirit, and we help you decode them to find peace and direction.
+                                We provide specialized guidance for navigating the spiritual and psychological depths of the mind. From decoding dreams to resolving nocturnal conflicts and aligning visionary insights, we help you secure internal peace and divine clarity.
                             </p>
 
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', textAlign: 'left' }}>
@@ -164,6 +164,35 @@ const Restore = () => {
                                         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.5 }}>{item.desc}</p>
                                     </motion.div>
                                 ))}
+                            </div>
+                        </div>
+
+
+                        <div style={{ marginTop: '8rem', textAlign: 'center' }}>
+                            <div className="glass" style={{
+                                padding: '3rem',
+                                borderRadius: 'var(--radius-lg)',
+                                maxWidth: '800px',
+                                margin: '0 auto',
+                                border: '1px solid rgba(239, 68, 68, 0.2)'
+                            }}>
+                                <h2 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--color-restore)' }}>Day of Clarity</h2>
+                                <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+                                    Join us for intensive restoration sessions scheduled for maximum focus and impact.
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+                                    {['Mondays', 'Tuesdays', 'Wednesdays', 'Fridays'].map((day, i) => (
+                                        <div key={i} style={{
+                                            padding: '1rem',
+                                            background: 'rgba(239, 68, 68, 0.05)',
+                                            borderRadius: '12px',
+                                            border: '1px solid rgba(239, 68, 68, 0.1)'
+                                        }}>
+                                            <div style={{ fontWeight: 800, marginBottom: '0.25rem' }}>{day}</div>
+                                            <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>3 Hours</div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 

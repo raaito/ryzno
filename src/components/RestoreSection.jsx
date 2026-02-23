@@ -75,7 +75,7 @@ const RestoreSection = () => {
                                     Our restoration process follows seven core principles—from Release to Elevate—designed to help you find the "gold" in your broken pieces.
                                 </p>
                                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                    {['Release', 'Embrace', 'Surrender', 'Transform', 'Overcome', 'Reclaim', 'Elevate', 'Dream Interpretation'].map((p, i) => (
+                                    {['Release', 'Embrace', 'Surrender', 'Transform', 'Overcome', 'Reclaim', 'Elevate', 'Subconscious Discernment'].map((p, i) => (
                                         <span key={i} style={{ fontSize: '0.75rem', padding: '0.3rem 0.8rem', borderRadius: '20px', background: 'rgba(239, 68, 68, 0.05)', color: 'var(--color-restore)', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
                                             {p}
                                         </span>
