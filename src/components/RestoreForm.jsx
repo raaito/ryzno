@@ -32,11 +32,13 @@ const RestoreForm = () => {
         requestedDuration: 1, // 1, 2, or 3 hours
         countryCode: '+234',
         feeAgreement: false,
-        proofOfPayment: null
+        proofOfPayment: null,
+        registrationType: 'standard' // standard, new-case, continuation
     });
     const [attemptedNext, setAttemptedNext] = useState(false);
     const [prevRecord, setPrevRecord] = useState(null);
     const [showResumptionModal, setShowResumptionModal] = useState(false);
+    const [lastCheckedEmail, setLastCheckedEmail] = useState('');
 
     const steps = [
         { id: 1, title: 'Identity', icon: <User size={20} /> },
@@ -109,8 +111,25 @@ const RestoreForm = () => {
         }
     };
 
-    const handleNext = () => {
+    const handleNext = async () => {
         if (isStepValid()) {
+            if (step === 1 && formData.email !== lastCheckedEmail) {
+                setLoading(true);
+                try {
+                    const res = await fetch(`/api/restore/check-record?email=${formData.email}`);
+                    const data = await res.json();
+                    setLastCheckedEmail(formData.email);
+                    if (data.found) {
+                        setPrevRecord(data.registration);
+                        setShowResumptionModal(true);
+                        setLoading(false);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Check record error:', err);
+                }
+                setLoading(false);
+            }
             setStep(s => Math.min(s + 1, 6));
             setAttemptedNext(false);
             window.scrollTo(0, 0);
@@ -164,10 +183,11 @@ const RestoreForm = () => {
     };
 
     const checkExistingRecord = async (email) => {
-        if (!email || !email.includes('@')) return;
+        if (!email || !email.includes('@') || email === lastCheckedEmail) return;
         try {
             const res = await fetch(`/api/restore/check-record?email=${email}`);
             const data = await res.json();
+            setLastCheckedEmail(email);
             if (data.found) {
                 setPrevRecord(data.registration);
                 setShowResumptionModal(true);
@@ -177,15 +197,57 @@ const RestoreForm = () => {
         }
     };
 
-    const handleResume = () => {
+    const handleResume = (type) => {
         if (prevRecord) {
             const { assignments, status, createdAt, updatedAt, _id, __v, ...rest } = prevRecord;
-            setFormData({
-                ...formData,
-                ...rest,
-                feeAgreement: false,
-                proofOfPayment: null
-            });
+
+            if (type === 'new-case') {
+                // Keep identity, reset concerns and story
+                setFormData({
+                    ...formData,
+                    firstName: rest.firstName,
+                    surname: rest.surname,
+                    email: rest.email,
+                    countryCode: rest.countryCode,
+                    phoneNumber: rest.phoneNumber,
+                    occupation: rest.occupation,
+                    ageRange: rest.ageRange,
+                    gender: rest.gender,
+                    consentToShare: rest.consentToShare,
+                    concerns: [],
+                    mostPressingIssue: '',
+                    duration: '',
+                    story: '',
+                    previousSupport: null,
+                    supportDetails: '',
+                    feeAgreement: false,
+                    proofOfPayment: null,
+                    registrationType: 'new-case'
+                });
+                setStep(2);
+            } else if (type === 'continuation') {
+                // Keep identity and story context, but clear expectations for new session
+                setFormData({
+                    ...formData,
+                    ...rest,
+                    expectations: '',
+                    feeAgreement: false,
+                    proofOfPayment: null,
+                    paymentPromise: false,
+                    paymentDate: null,
+                    registrationType: 'continuation'
+                });
+                setStep(4);
+            } else {
+                // Standard resume (full data reload)
+                setFormData({
+                    ...formData,
+                    ...rest,
+                    feeAgreement: false,
+                    proofOfPayment: null,
+                    registrationType: 'standard'
+                });
+            }
             setShowResumptionModal(false);
         }
     };
@@ -827,6 +889,25 @@ const RestoreForm = () => {
             <form onSubmit={handleSubmit}>
                 <AnimatePresence mode="wait">
                     <div style={{ minHeight: '400px' }}>
+                        {formData.registrationType !== 'standard' && step < 6 && (
+                            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} style={{
+                                background: formData.registrationType === 'continuation' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                                color: formData.registrationType === 'continuation' ? 'var(--color-restore)' : '#000',
+                                padding: '0.75rem 1.5rem',
+                                borderRadius: '50px',
+                                fontSize: '0.8rem',
+                                fontWeight: 800,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.5rem',
+                                marginBottom: '2rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}>
+                                {formData.registrationType === 'continuation' ? <Heart size={14} /> : <AlertCircle size={14} />}
+                                Returning User: {formData.registrationType === 'continuation' ? 'Continuation of Previous Session' : 'New Case / Issue'}
+                            </motion.div>
+                        )}
                         {renderStep()}
                     </div>
                 </AnimatePresence>
@@ -859,6 +940,7 @@ const RestoreForm = () => {
                             <motion.button
                                 type="button"
                                 onClick={handleNext}
+                                disabled={loading}
                                 animate={attemptedNext && !isCurrentStepValid ? { x: [0, -10, 10, -10, 10, 0] } : {}}
                                 transition={{ duration: 0.4 }}
                                 style={{
@@ -871,14 +953,17 @@ const RestoreForm = () => {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '0.75rem',
-                                    cursor: 'pointer',
+                                    cursor: loading ? 'wait' : (isCurrentStepValid ? 'pointer' : 'default'),
                                     boxShadow: isCurrentStepValid ? '0 15px 30px rgba(239, 68, 68, 0.3)' : 'none',
-                                    transition: 'all 0.3s'
+                                    transition: 'all 0.3s',
+                                    opacity: loading ? 0.8 : 1
                                 }}
-                                onMouseEnter={e => isCurrentStepValid && (e.target.style.transform = 'translateY(-3px)')}
-                                onMouseLeave={e => isCurrentStepValid && (e.target.style.transform = 'translateY(0)')}
+                                onMouseEnter={e => isCurrentStepValid && !loading && (e.target.style.transform = 'translateY(-3px)')}
+                                onMouseLeave={e => isCurrentStepValid && !loading && (e.target.style.transform = 'translateY(0)')}
                             >
-                                Continue <ArrowRight size={18} />
+                                {loading && step === 1 ? 'Checking Email...' : (
+                                    <>Continue <ArrowRight size={18} /></>
+                                )}
                             </motion.button>
                         ) : (
                             <motion.button
@@ -927,16 +1012,22 @@ const RestoreForm = () => {
                             </p>
                             <div style={{ display: 'grid', gap: '1rem' }}>
                                 <button
-                                    onClick={handleResume}
+                                    onClick={() => handleResume('continuation')}
                                     style={{ padding: '1.2rem', background: 'var(--color-restore)', color: '#fff', borderRadius: '50px', border: 'none', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s' }}
                                 >
-                                    Yes, Continue session
+                                    🔄 This is a Continuation
+                                </button>
+                                <button
+                                    onClick={() => handleResume('new-case')}
+                                    style={{ padding: '1.2rem', background: '#000', color: '#fff', borderRadius: '50px', border: 'none', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s' }}
+                                >
+                                    ✨ Different Case / Issue
                                 </button>
                                 <button
                                     onClick={() => { setPrevRecord(null); setShowResumptionModal(false); }}
-                                    style={{ padding: '1.2rem', background: '#f3f4f6', color: '#000', borderRadius: '50px', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                                    style={{ padding: '1rem', background: '#f3f4f6', color: '#666', borderRadius: '50px', border: 'none', fontWeight: 700, cursor: 'pointer' }}
                                 >
-                                    No, Start from scratch
+                                    🆕 No, Start from scratch
                                 </button>
                             </div>
                         </motion.div>
