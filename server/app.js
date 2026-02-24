@@ -9,6 +9,9 @@ import Lesson from './models/Lesson.js';
 import Setting from './models/Setting.js';
 import Contact from './models/Contact.js';
 import RestoreRegistration from './models/RestoreRegistration.js';
+import { findAvailableSlots, validateAssignments, isSlotAvailable } from './utils/schedulingUtils.js';
+import { sendRegistrationConfirmation, sendReassignmentNotification } from './utils/whatsappService.js';
+import { sendRestoreConfirmationEmail, sendRestoreReassignmentEmail } from './utils/emailService.js';
 
 import crypto from 'crypto';
 
@@ -44,7 +47,12 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        if (!origin ||
+            allowedOrigins.includes(origin) ||
+            origin.startsWith('http://localhost:') ||
+            origin.startsWith('http://127.0.0.1:') ||
+            origin.endsWith('.vercel.app')
+        ) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
@@ -446,21 +454,124 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
+app.get('/api/restore/availability', async (req, res) => {
+    const { duration } = req.query;
+    try {
+        const assignments = await findAvailableSlots(parseInt(duration) || 1);
+        res.json(assignments);
+    } catch (error) {
+        res.status(500).json({ message: 'Error checking availability' });
+    }
+});
+
+app.get('/api/restore/check-record', async (req, res) => {
+    const { email } = req.query;
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+    try {
+        const registration = await RestoreRegistration.findOne({ email }).sort({ createdAt: -1 });
+        if (registration) {
+            res.json({ found: true, registration });
+        } else {
+            res.json({ found: false });
+        }
+    } catch (error) {
+        console.error('RESTORE REGISTRATION ERROR:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
 app.post('/api/restore/register', async (req, res) => {
     console.log('Incoming Restore registration:', req.body);
     try {
+        const { requestedDuration, feeAgreement, paymentPromise, paymentDate } = req.body;
+
+        let status = 'pending';
+        let assignments = [];
+
+        if (feeAgreement) {
+            assignments = await findAvailableSlots(requestedDuration || 1);
+            status = 'scheduled';
+        } else if (paymentPromise) {
+            status = 'promised';
+        } else {
+            status = 'incomplete';
+        }
+
         const registration = await RestoreRegistration.create({
             id: crypto.randomUUID(),
-            ...req.body
+            ...req.body,
+            countryCode: req.body.countryCode || '+234', // Ensure fallback
+            assignments,
+            status
         });
+
+        if (status === 'scheduled') {
+            // Send dual-channel notifications only if scheduled
+            await sendRestoreConfirmationEmail(registration);
+            await sendRegistrationConfirmation(registration);
+        }
+
         res.status(201).json({
             success: true,
-            message: 'Registration submitted successfully!',
-            registrationId: registration.id
+            message: status === 'scheduled'
+                ? 'Registration submitted and scheduled successfully!'
+                : (status === 'promised' ? 'Payment promise recorded. We will remind you!' : 'Registration saved. Contact us when ready to book.'),
+            registrationId: registration.id,
+            assignments,
+            status
         });
     } catch (error) {
-        console.error('Restore Registration Error:', error);
-        res.status(500).json({ message: 'Error submitting registration' });
+        console.error('RESTORE REGISTRATION ERROR:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+            error: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+    }
+});
+
+app.post('/api/restore/registrations/:id/reassign', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { id } = req.params;
+    const { assignments, reason } = req.body;
+
+    if (!reason || !assignments || !assignments.length) {
+        return res.status(400).json({ message: 'Assignments and a reason are required for reassignment.' });
+    }
+
+    try {
+        const registration = await RestoreRegistration.findOne({ id });
+        if (!registration) return res.status(404).json({ message: 'Registration not found' });
+
+        // Check for conflicts
+        const isFree = await validateAssignments(assignments, id);
+        if (!isFree) {
+            return res.status(409).json({ message: 'Conflict detected: One or more slots are already occupied. Please move the other appointment or pick a different slot.' });
+        }
+
+        const oldAssignments = [...registration.assignments];
+        registration.assignments = assignments;
+        registration.reassignmentHistory.push({
+            reason,
+            oldAssignments
+        });
+        registration.status = 'scheduled';
+
+        await registration.save();
+
+        // Notify user via Email and WhatsApp
+        await sendRestoreReassignmentEmail(registration, reason);
+        await sendReassignmentNotification(registration, reason);
+
+        res.json({ success: true, message: 'Session reassigned and notifications sent.', registration });
+    } catch (error) {
+        console.error('Reassignment Error:', error);
+        res.status(500).json({ message: 'Error reassigning session' });
     }
 });
 

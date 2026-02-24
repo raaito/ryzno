@@ -11,6 +11,7 @@ const RestoreForm = () => {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('idle'); // idle, success, error
+    const [assignmentsPreview, setAssignmentsPreview] = useState([]);
     const [formData, setFormData] = useState({
         firstName: '',
         surname: '',
@@ -28,12 +29,14 @@ const RestoreForm = () => {
         story: '',
         consentToShare: false,
         expectations: '',
-        preferredTime: '',
-        alternativeTimeConsent: false,
+        requestedDuration: 1, // 1, 2, or 3 hours
+        countryCode: '+234',
         feeAgreement: false,
         proofOfPayment: null
     });
     const [attemptedNext, setAttemptedNext] = useState(false);
+    const [prevRecord, setPrevRecord] = useState(null);
+    const [showResumptionModal, setShowResumptionModal] = useState(false);
 
     const steps = [
         { id: 1, title: 'Identity', icon: <User size={20} /> },
@@ -43,6 +46,29 @@ const RestoreForm = () => {
         { id: 5, title: 'Commitment', icon: <Shield size={20} /> }
     ];
 
+    const validatePhoneNumber = (code, number) => {
+        if (!code || !number) return false;
+        const cleanNumber = number.replace(/\D/g, '');
+        const cleanCode = code.replace(/\D/g, '');
+
+        // Validation logic for common country codes
+        const rules = {
+            '234': /^(\d{10,11})$/,      // Nigeria
+            '1': /^(\d{10})$/,          // USA/Canada
+            '44': /^(\d{10})$/,         // UK
+            '233': /^(\d{9})$/,         // Ghana
+            '27': /^(\d{9})$/,          // South Africa
+            '254': /^(\d{9})$/          // Kenya
+        };
+
+        if (rules[cleanCode]) {
+            return rules[cleanCode].test(cleanNumber);
+        }
+
+        // Generic fallback: most international numbers are 7-15 digits
+        return cleanNumber.length >= 7 && cleanNumber.length <= 15;
+    };
+
     const isStepValid = () => {
         switch (step) {
             case 1:
@@ -50,7 +76,9 @@ const RestoreForm = () => {
                     formData.firstName &&
                     formData.surname &&
                     formData.email &&
+                    formData.countryCode &&
                     formData.phoneNumber &&
+                    validatePhoneNumber(formData.countryCode, formData.phoneNumber) &&
                     formData.occupation &&
                     formData.ageRange &&
                     formData.gender &&
@@ -70,13 +98,12 @@ const RestoreForm = () => {
             case 4:
                 return (
                     formData.expectations &&
-                    formData.preferredTime
+                    formData.requestedDuration
                 );
             case 5:
-                return (
-                    formData.feeAgreement &&
-                    formData.proofOfPayment
-                );
+                if (formData.feeAgreement) return !!formData.proofOfPayment;
+                if (formData.paymentPromise) return !!formData.paymentDate;
+                return true;
             default:
                 return true;
         }
@@ -124,12 +151,42 @@ const RestoreForm = () => {
                 setStatus('success');
                 setStep(6);
             } else {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Registration failed:', errorData);
                 setStatus('error');
             }
         } catch (error) {
+            console.error('Registration error:', error);
             setStatus('error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const checkExistingRecord = async (email) => {
+        if (!email || !email.includes('@')) return;
+        try {
+            const res = await fetch(`/api/restore/check-record?email=${email}`);
+            const data = await res.json();
+            if (data.found) {
+                setPrevRecord(data.registration);
+                setShowResumptionModal(true);
+            }
+        } catch (err) {
+            console.error('Check record error:', err);
+        }
+    };
+
+    const handleResume = () => {
+        if (prevRecord) {
+            const { assignments, status, createdAt, updatedAt, _id, __v, ...rest } = prevRecord;
+            setFormData({
+                ...formData,
+                ...rest,
+                feeAgreement: false,
+                proofOfPayment: null
+            });
+            setShowResumptionModal(false);
         }
     };
 
@@ -241,17 +298,38 @@ const RestoreForm = () => {
                                     placeholder="you@example.com"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    onBlur={e => checkExistingRecord(e.target.value)}
                                 />
                             </div>
                             <div>
-                                <label style={labelStyle}>Phone Number *</label>
-                                <input
-                                    style={getFieldStyle(formData.phoneNumber)}
-                                    className="restore-input"
-                                    placeholder="e.g. +234..."
-                                    value={formData.phoneNumber}
-                                    onChange={e => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                />
+                                <label style={labelStyle}>Phone Number (preferably WhatsApp) *</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: '100px 1fr', gap: '1rem' }}>
+                                    <input
+                                        style={getFieldStyle(formData.countryCode)}
+                                        className="restore-input"
+                                        placeholder="+234"
+                                        value={formData.countryCode}
+                                        onChange={e => {
+                                            let val = e.target.value;
+                                            if (val && !val.startsWith('+')) val = '+' + val.replace(/\D/g, '');
+                                            setFormData({ ...formData, countryCode: val });
+                                        }}
+                                    />
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            style={getFieldStyle(formData.phoneNumber)}
+                                            className="restore-input"
+                                            placeholder="Phone number"
+                                            value={formData.phoneNumber}
+                                            onChange={e => setFormData({ ...formData, phoneNumber: e.target.value.replace(/\D/g, '') })}
+                                        />
+                                        {formData.phoneNumber && !validatePhoneNumber(formData.countryCode, formData.phoneNumber) && (
+                                            <span style={{ position: 'absolute', bottom: '-1.5rem', left: '0.5rem', color: '#ef4444', fontSize: '0.7rem', fontWeight: 700 }}>
+                                                Invalid format for {formData.countryCode}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
                             <div>
                                 <label style={labelStyle}>Occupation *</label>
@@ -464,10 +542,20 @@ const RestoreForm = () => {
                     </motion.div>
                 );
             case 4:
+                const fetchPreview = async (dur) => {
+                    try {
+                        const res = await fetch(`/api/restore/availability?duration=${dur}`);
+                        const data = await res.json();
+                        setAssignmentsPreview(data);
+                    } catch (err) {
+                        console.error('Failed to fetch preview:', err);
+                    }
+                };
+
                 return (
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
-                        <h2 style={sectionTitleStyle} className="restore-section-title">Scheduling</h2>
-                        <p style={sectionDescStyle}>Sessions are currently held on <strong>Wednesdays only</strong>. All sessions are 60 minutes.</p>
+                        <h2 style={sectionTitleStyle} className="restore-section-title">Session Scheduling</h2>
+                        <p style={sectionDescStyle}>The system automatically picks the earliest available slots on Mon, Tue, Wed, and Fri (3h max/day).</p>
                         <div style={{ display: 'grid', gap: '2rem' }}>
                             <div>
                                 <label style={labelStyle}>What are you hoping to gain? *</label>
@@ -480,28 +568,26 @@ const RestoreForm = () => {
                                 />
                             </div>
                             <div>
-                                <label style={labelStyle}>Preferred Session Time (Wednesdays) *</label>
+                                <label style={labelStyle}>How many hours do you want your session to last? *</label>
                                 <div className="restore-grid-2" style={{
-                                    padding: (attemptedNext && !formData.preferredTime) ? '8px' : '0',
+                                    padding: (attemptedNext && !formData.requestedDuration) ? '8px' : '0',
                                     borderRadius: '32px',
-                                    border: (attemptedNext && !formData.preferredTime) ? '2px solid #ef4444' : 'none'
+                                    border: (attemptedNext && !formData.requestedDuration) ? '2px solid #ef4444' : 'none'
                                 }}>
-                                    {[
-                                        "6.00 PM - 7.00 PM",
-                                        "7.15 PM - 8.15 PM",
-                                        "8.30 PM - 9.30 PM",
-                                        "9.45 PM - 10.45 PM"
-                                    ].map(time => (
+                                    {[1, 2, 3].map(dur => (
                                         <button
-                                            key={time}
+                                            key={dur}
                                             type="button"
-                                            onClick={() => setFormData({ ...formData, preferredTime: time })}
+                                            onClick={() => {
+                                                setFormData({ ...formData, requestedDuration: dur });
+                                                fetchPreview(dur);
+                                            }}
                                             style={{
                                                 padding: '1.2rem',
                                                 borderRadius: '24px',
-                                                background: formData.preferredTime === time ? '#000' : '#fff',
-                                                color: formData.preferredTime === time ? '#fff' : '#000',
-                                                border: formData.preferredTime === time ? '1px solid transparent' : '1px solid rgba(0,0,0,0.05)',
+                                                background: formData.requestedDuration === dur ? '#000' : '#fff',
+                                                color: formData.requestedDuration === dur ? '#fff' : '#000',
+                                                border: formData.requestedDuration === dur ? '1px solid transparent' : '1px solid rgba(0,0,0,0.05)',
                                                 fontWeight: 800,
                                                 fontSize: '0.9rem',
                                                 cursor: 'pointer',
@@ -512,22 +598,35 @@ const RestoreForm = () => {
                                                 gap: '0.5rem'
                                             }}
                                         >
-                                            <Clock size={16} /> {time}
+                                            <Clock size={16} /> {dur} {dur === 1 ? 'Hour' : 'Hours'}
                                         </button>
                                     ))}
                                 </div>
                             </div>
-                            <div>
-                                <label style={{ ...labelStyle, textTransform: 'none', opacity: 0.8, fontSize: '0.9rem', marginBottom: '1rem', display: 'flex', alignItems: 'start', gap: '1rem' }}>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.alternativeTimeConsent}
-                                        onChange={e => setFormData({ ...formData, alternativeTimeConsent: e.target.checked })}
-                                        style={{ width: '20px', height: '20px', cursor: 'pointer', marginTop: '2px' }}
-                                    />
-                                    If your selected time slot becomes unavailable, are you open to being contacted for an alternative time?
-                                </label>
-                            </div>
+
+                            {assignmentsPreview.length > 0 && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{
+                                    background: 'rgba(239, 68, 68, 0.05)',
+                                    padding: '2rem',
+                                    borderRadius: '32px',
+                                    border: '1px solid rgba(239, 68, 68, 0.1)'
+                                }}>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--color-restore)', marginBottom: '1rem', textTransform: 'uppercase' }}>Assigned Slots</h4>
+                                    <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                        {assignmentsPreview.map((a, idx) => (
+                                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '1rem', fontWeight: 700 }}>
+                                                <Calendar size={18} opacity={0.5} />
+                                                <span>{new Date(a.date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                                                <span style={{ opacity: 0.5 }}>@</span>
+                                                <span>{a.startTime}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p style={{ marginTop: '1rem', fontSize: '0.85rem', opacity: 0.6, fontStyle: 'italic' }}>
+                                        {assignmentsPreview.length > 1 ? "Note: Your session has been split across multiple days due to availability." : "Your session will be completed in a single day."}
+                                    </p>
+                                </motion.div>
+                            )}
                         </div>
                     </motion.div>
                 );
@@ -540,7 +639,7 @@ const RestoreForm = () => {
                                 NOTE: The RESTORE Session is a guided one-on-one counselling session designed to offer focused care and support.
                             </p>
                             <p style={{ color: '#000', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                                Each session lasts 60 minutes and requires a commitment fee of <strong>₦5,000 ($3.53)</strong> to help us prepare adequately and honour the time set aside for you.
+                                Each session lasts 60 minutes and requires a commitment fee of <strong>₦5,000 / $5</strong> to help us prepare adequately and honour the time set aside for you.
                             </p>
                         </div>
                         <div style={{ display: 'grid', gap: '2rem' }}>
@@ -616,6 +715,39 @@ const RestoreForm = () => {
                                     </div>
                                 </motion.div>
                             )}
+
+                            {attemptedNext && !formData.feeAgreement && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ background: '#fff4f4', padding: '1.5rem', borderRadius: '24px', border: '1px solid #ef4444' }}>
+                                    <p style={{ color: '#ef4444', fontWeight: 700, fontSize: '0.9rem', marginBottom: '1rem' }}>
+                                        ⚠️ Note: Without payment, you cannot book a session right now.
+                                    </p>
+                                    <label style={{ ...labelStyle, textTransform: 'none', opacity: 1, fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.paymentPromise}
+                                            onChange={e => setFormData({ ...formData, paymentPromise: e.target.checked })}
+                                            style={{ width: '22px', height: '22px' }}
+                                        />
+                                        Would you like to book and pay for a later date?
+                                    </label>
+
+                                    {formData.paymentPromise && (
+                                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} style={{ marginTop: '1.5rem' }}>
+                                            <label style={labelStyle}>When do you plan to make the payment?</label>
+                                            <input
+                                                type="date"
+                                                style={getFieldStyle(formData.paymentDate)}
+                                                value={formData.paymentDate}
+                                                onChange={e => setFormData({ ...formData, paymentDate: e.target.value })}
+                                                min={new Date().toISOString().split('T')[0]}
+                                            />
+                                            <p style={{ fontSize: '0.8rem', opacity: 0.6, marginTop: '0.5rem' }}>
+                                                We will send you a reminder on this day. Once paid, you will be assigned a slot.
+                                            </p>
+                                        </motion.div>
+                                    )}
+                                </motion.div>
+                            )}
                         </div>
                     </motion.div>
                 );
@@ -625,9 +757,16 @@ const RestoreForm = () => {
                         <div style={{ width: '100px', height: '100px', background: 'var(--color-restore)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2.5rem auto', boxShadow: '0 20px 40px rgba(239, 68, 68, 0.3)' }}>
                             <CheckCircle size={50} color="#fff" />
                         </div>
-                        <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1.5rem' }}>Submission Received!</h2>
-                        <p style={{ fontSize: '1.2rem', color: '#666', lineHeight: 1.6, maxWidth: '500px', margin: '0 auto' }}>
-                            Your registration for a RESTORE session has been successfully submitted. We will review your details and contact you soon for confirmation.
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '1.5rem' }}>
+                            {formData.feeAgreement ? "Registration Complete!" : (formData.paymentPromise ? "Payment Promise Recorded" : "Registration Saved")}
+                        </h2>
+                        <p style={{ fontSize: '1.2rem', color: '#666', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
+                            {formData.feeAgreement
+                                ? "Your restoration session has been scheduled. Please check your Email and WhatsApp for confirmation details."
+                                : (formData.paymentPromise
+                                    ? `We have recorded your promise to pay on ${new Date(formData.paymentDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}. A reminder will be sent to you then!`
+                                    : "Your information has been saved in our system. You can reach out to us whenever you are ready to proceed with a booking.")
+                            }
                         </p>
                         <button
                             onClick={() => window.location.href = '/'}
@@ -766,9 +905,44 @@ const RestoreForm = () => {
                                 {loading ? 'Submitting...' : 'Complete Registration'} <CheckCircle size={18} />
                             </motion.button>
                         )}
+                        {status === 'error' && (
+                            <p style={{ color: '#ef4444', fontSize: '0.9rem', fontWeight: 700, marginTop: '1rem', textAlign: 'center', width: '100%' }}>
+                                Something went wrong. Please check your details or try again later.
+                            </p>
+                        )}
                     </div>
                 )}
             </form>
+
+            <AnimatePresence>
+                {showResumptionModal && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(10px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+                        <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} style={{ background: '#fff', padding: '3rem', borderRadius: '40px', maxWidth: '500px', textAlign: 'center', boxShadow: '0 30px 60px rgba(0,0,0,0.12)' }}>
+                            <div style={{ width: '80px', height: '80px', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 2rem auto' }}>
+                                <Heart size={40} color="var(--color-restore)" />
+                            </div>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1rem' }}>Welcome Back!</h3>
+                            <p style={{ color: '#666', lineHeight: 1.6, marginBottom: '2.5rem' }}>
+                                We found a previous registration attempt for <strong>{prevRecord.firstName}</strong>. Would you like to continue from where you left off?
+                            </p>
+                            <div style={{ display: 'grid', gap: '1rem' }}>
+                                <button
+                                    onClick={handleResume}
+                                    style={{ padding: '1.2rem', background: 'var(--color-restore)', color: '#fff', borderRadius: '50px', border: 'none', fontWeight: 800, cursor: 'pointer', transition: 'all 0.3s' }}
+                                >
+                                    Yes, Continue session
+                                </button>
+                                <button
+                                    onClick={() => { setPrevRecord(null); setShowResumptionModal(false); }}
+                                    style={{ padding: '1.2rem', background: '#f3f4f6', color: '#000', borderRadius: '50px', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+                                >
+                                    No, Start from scratch
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
