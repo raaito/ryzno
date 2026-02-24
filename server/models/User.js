@@ -6,8 +6,9 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     fullName: { type: String },
     email: { type: String, unique: true },
-    role: { type: String, enum: ['STUDENT', 'LECTURER', 'ADMIN'], default: 'STUDENT' },
+    role: { type: String, enum: ['STUDENT', 'LECTURER', 'ADMIN', 'CLIENT'], default: 'STUDENT' },
     courses: [{ type: String }], // Array of course IDs
+    mustChangePassword: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now }
 });
 

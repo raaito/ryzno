@@ -61,7 +61,27 @@ const LecturerRestore = () => {
     };
 
     const deleteEntry = async (id) => {
-        // ... (existing code)
+        if (!window.confirm('Are you sure you want to delete this registration? This action cannot be undone.')) return;
+
+        try {
+            const res = await fetch(`/api/restore/registrations/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (res.ok) {
+                setRegistrations(registrations.filter(r => r.id !== id));
+                if (selectedEntry?.id === id) setSelectedEntry(null);
+                setStatus('Registration deleted successfully.');
+                setTimeout(() => setStatus(''), 3000);
+            } else {
+                const data = await res.json().catch(() => ({}));
+                setStatus(data.message || 'Failed to delete registration.');
+            }
+        } catch (error) {
+            console.error('Delete error:', error);
+            setStatus('Error deleting registration.');
+        }
     };
 
     const handleReassign = async () => {
@@ -101,7 +121,17 @@ const LecturerRestore = () => {
     };
 
     const fetchNewAvailability = async (duration) => {
-        // ... (existing code)
+        try {
+            const res = await fetch(`/api/restore/availability?duration=${duration}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setReassignData(prev => ({ ...prev, assignments: data }));
+            }
+        } catch (error) {
+            console.error('Error fetching availability:', error);
+        }
     };
 
     const getCalendarDays = () => {
@@ -478,12 +508,15 @@ const LecturerRestore = () => {
                                         <div style={{ marginBottom: '1.5rem' }}>
                                             <label style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: '0.5rem', display: 'block' }}>New Assigned Slots</label>
                                             <div style={{ display: 'grid', gap: '0.5rem', background: '#fff', padding: '1rem', borderRadius: '15px', border: '1px solid #eee' }}>
-                                                {reassignData.assignments.map((a, i) => (
-                                                    <div key={i} style={{ display: 'flex', gap: '0.5rem', fontWeight: 700, fontSize: '0.9rem' }}>
-                                                        <span>{new Date(a.date).toLocaleDateString()}</span> @ <span>{a.startTime}</span>
-                                                    </div>
-                                                ))}
-                                                {reassignData.assignments.length === 0 && <span style={{ opacity: 0.5 }}>Identifying next free slots...</span>}
+                                                {reassignData.assignments.length === 0 ? (
+                                                    <span style={{ opacity: 0.5 }}>Scanning for earliest available slots...</span>
+                                                ) : (
+                                                    reassignData.assignments.map((a, i) => (
+                                                        <div key={i} style={{ display: 'flex', gap: '0.5rem', fontWeight: 700, fontSize: '0.9rem' }}>
+                                                            <span>{new Date(a.date).toLocaleDateString()}</span> @ <span>{a.startTime}</span>
+                                                        </div>
+                                                    ))
+                                                )}
                                             </div>
                                         </div>
 

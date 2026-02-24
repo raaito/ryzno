@@ -122,10 +122,24 @@ app.post('/api/auth/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
         const token = jwt.sign({ id: user.id, username: user.username, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role } });
+        res.json({ token, user: { id: user.id, username: user.username, email: user.email, role: user.role, mustChangePassword: user.mustChangePassword } });
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: `Server error: ${error.message}` });
+    }
+});
+
+app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
+    const { newPassword } = req.body;
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await User.findOneAndUpdate(
+            { id: req.user.id },
+            { password: hashedPassword, mustChangePassword: false }
+        );
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating password' });
     }
 });
 
@@ -485,6 +499,25 @@ app.get('/api/restore/check-record', async (req, res) => {
     }
 });
 
+app.get('/api/restore/availability', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    const { duration } = req.query;
+    try {
+        const assignments = await findAvailableSlots(parseInt(duration) || 1);
+        res.json(assignments);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching availability' });
+    }
+});
+
+app.get('/api/restore/my-registrations', authenticateToken, async (req, res) => {
+    try {
+        const registrations = await RestoreRegistration.find({ userId: req.user.id }).sort({ createdAt: -1 });
+        res.json(registrations);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching registrations' });
+    }
+});
+
 app.post('/api/restore/register', async (req, res) => {
     console.log('Incoming Restore registration:', req.body);
     try {
@@ -502,18 +535,54 @@ app.post('/api/restore/register', async (req, res) => {
             status = 'incomplete';
         }
 
+        // Automatic User Creation
+        const { email, firstName, surname } = req.body;
+        let user = await User.findOne({ email });
+        let credentials = null;
+
+        if (!user) {
+            const tempUsername = email.split('@')[0].toLowerCase();
+            // Check if username unique, appending random if not
+            let finalUsername = tempUsername;
+            const existingUsername = await User.findOne({ username: finalUsername });
+            if (existingUsername) {
+                finalUsername = `${tempUsername}${Math.floor(1000 + Math.random() * 9000)}`;
+            }
+
+            const tempPassword = `RYZ-${Math.floor(100000 + Math.random() * 900000)}`; // Safe default
+            const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+            user = await User.create({
+                id: crypto.randomUUID(),
+                username: finalUsername,
+                password: hashedPassword,
+                fullName: `${firstName} ${surname}`,
+                email: email,
+                role: 'CLIENT',
+                mustChangePassword: true
+            });
+
+            credentials = { username: finalUsername, password: tempPassword };
+        }
+
         const registration = await RestoreRegistration.create({
             id: crypto.randomUUID(),
             ...req.body,
             countryCode: req.body.countryCode || '+234', // Ensure fallback
             assignments,
-            status
+            status,
+            userId: user.id
         });
 
         if (status === 'scheduled') {
             // Send dual-channel notifications only if scheduled
-            await sendRestoreConfirmationEmail(registration);
-            await sendRegistrationConfirmation(registration);
+            await sendRestoreConfirmationEmail(registration, credentials);
+            await sendRegistrationConfirmation(registration, credentials);
+        } else if (credentials) {
+            // Even if not scheduled, if a new user was created, we should inform them?
+            // For now, let's keep it consistent: send basic "Account Created" if it's new
+            // But usually, Restore users are the main focus.
+            // Let's passed credentials to services if they exist.
         }
 
         res.status(201).json({

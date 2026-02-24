@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Menu, X, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 import logo from '../assets/1000665431.png';
 
@@ -10,6 +11,7 @@ const Navbar = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const navLinks = [
     { name: 'HOME', href: '/', isHash: false },
@@ -87,6 +89,14 @@ const Navbar = () => {
               </Link>
             )
           ))}
+          {user && (
+            <Link
+              to="/profile"
+              style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--color-restore)', transition: 'all 0.3s ease' }}
+            >
+              PROFILE
+            </Link>
+          )}
           <button className="glow-soar" style={{
             padding: '0.5rem 1.25rem',
             borderRadius: '50px',
@@ -168,6 +178,15 @@ const Navbar = () => {
                 </Link>
               )
             ))}
+            {user && (
+              <Link
+                to="/profile"
+                onClick={() => setIsOpen(false)}
+                style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--color-restore)' }}
+              >
+                PROFILE
+              </Link>
+            )}
             <button
               className="glow-soar"
               style={{

@@ -105,7 +105,7 @@ const RestoreForm = () => {
             case 5:
                 if (formData.feeAgreement) return !!formData.proofOfPayment;
                 if (formData.paymentPromise) return !!formData.paymentDate;
-                return true;
+                return false;
             default:
                 return true;
         }

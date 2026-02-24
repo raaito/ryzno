@@ -16,7 +16,7 @@ export const sendEmail = async (to, subject, html) => {
     return true;
 };
 
-export const sendRestoreConfirmationEmail = async (data) => {
+export const sendRestoreConfirmationEmail = async (data, credentials = null) => {
     const { firstName, email, assignments } = data;
 
     let scheduleHtml = assignments.map(a => {
@@ -41,6 +41,18 @@ export const sendRestoreConfirmationEmail = async (data) => {
                     <ul>${scheduleHtml}</ul>
                 </div>
                 <p>Please ensure you are available for these times as we have reserved them specifically for you.</p>
+                ${credentials ? `
+                <div style="background: #eef2ff; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #4f46e5;">
+                    <p style="margin-top: 0; color: #4f46e5;"><strong>🔐 Your Secure Account Access:</strong></p>
+                    <p>We have created a standalone profile for you to track your session reports, summaries, and resources.</p>
+                    <p><strong>Username:</strong> ${credentials.username}<br>
+                    <strong>Default Password:</strong> ${credentials.password}</p>
+                    <p style="font-size: 0.9rem; color: #666;"><em>Note: Please log in and change your password immediately for security.</em></p>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="https://ryzno.com/login" style="background: #000; color: #fff; padding: 12px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 0.9rem;">Login to Your Profile</a>
+                    </div>
+                </div>
+                ` : ''}
                 <p>If you have any questions, feel free to reach out to us on WhatsApp.</p>
                 <br>
                 <p>Warm regards,<br>The Ryzno Team</p>

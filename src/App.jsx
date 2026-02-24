@@ -15,6 +15,8 @@ import LecturerMessages from './pages/LecturerMessages';
 import LecturerRestore from './pages/LecturerRestore';
 import LecturerUsers from './pages/LecturerUsers';
 import Welcome from './pages/Welcome';
+import Profile from './pages/Profile';
+import ChangePassword from './pages/ChangePassword';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -75,6 +77,23 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['LECTURER']}>
                 <LecturerUsers />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute allowedRoles={['CLIENT', 'STUDENT', 'LECTURER']}>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/change-password"
+            element={
+              <ProtectedRoute allowedRoles={['CLIENT', 'STUDENT', 'LECTURER']}>
+                <ChangePassword />
               </ProtectedRoute>
             }
           />

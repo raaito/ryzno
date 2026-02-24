@@ -24,7 +24,7 @@ export const sendWhatsAppMessage = async (phoneNumber, message) => {
 /**
  * Sends a registration confirmation message.
  */
-export const sendRegistrationConfirmation = async (data) => {
+export const sendRegistrationConfirmation = async (data, credentials = null) => {
     const { firstName, countryCode, phoneNumber, assignments } = data;
     const fullNumber = `${countryCode || '+234'}${phoneNumber}`;
 
@@ -45,6 +45,7 @@ Based on our current availability, your session has been scheduled for:
 ${scheduleText}
 
 Please ensure you are available at these times. We have also sent a confirmation to your email.
+${credentials ? `\n🔐 *YOUR ACCOUNT ACCESS*:\nWe've created a profile for you to track your session reports and summaries.\n*Username:* ${credentials.username}\n*Default Password:* ${credentials.password}\nPlease login at ryzno.com/login and change your password immediately for security.` : ''}
 
 We look forward to beginning this journey of renovation with you!`;
 

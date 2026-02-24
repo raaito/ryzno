@@ -36,8 +36,21 @@ const Login = () => {
 
             if (response.ok) {
                 login(data.user, data.token);
-                const origin = location.state?.from?.pathname || '/academy';
-                navigate(origin, { replace: true });
+                if (data.user.mustChangePassword) {
+                    navigate('/change-password', { replace: true });
+                } else {
+                    const origin = location.state?.from?.pathname;
+                    if (origin) {
+                        navigate(origin, { replace: true });
+                    } else {
+                        // Role based redirect
+                        if (data.user.role === 'CLIENT') {
+                            navigate('/profile', { replace: true });
+                        } else {
+                            navigate('/academy', { replace: true });
+                        }
+                    }
+                }
             } else {
                 setError(data.message || 'Login failed');
             }

@@ -55,6 +55,7 @@ const restoreRegistrationSchema = new mongoose.Schema({
 
     status: { type: String, default: 'pending' }, // pending, scheduled, completed, promised, incomplete
     registrationType: { type: String, default: 'standard' }, // standard, new-case, continuation
+    userId: { type: String }, // Link to User.id
     reminderSent: { type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
