@@ -158,6 +158,9 @@ const LecturerDashboard = () => {
                         <Link to="/academy/lecturer/messages" style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', textDecoration: 'none', color: '#666', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Mail size={14} /> Messages
                         </Link>
+                        <Link to="/academy/lecturer/community" style={{ padding: '0.6rem 1.25rem', borderRadius: '50px', textDecoration: 'none', color: '#666', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <Users size={14} /> Community
+                        </Link>
                     </div>
                 </div>
                 <button onClick={handleLogout} className="logout-btn" style={{ background: 'none', border: 'none', color: '#000', opacity: 0.6, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700, fontSize: '0.85rem' }}>

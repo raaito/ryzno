@@ -7,7 +7,7 @@ import restoreImg from '../assets/restore.png';
 import roarImg from '../assets/roar.png';
 import { useNavigate } from 'react-router-dom';
 
-const HeroSection = () => {
+const HeroSection = ({ onJoinCommunity }) => {
     const navigate = useNavigate();
     const [currentSlide, setCurrentSlide] = useState(0);
     const slides = [
@@ -204,6 +204,20 @@ const HeroSection = () => {
                                     transition: 'all 0.3s ease'
                                 }} onClick={() => navigate(slides[currentSlide].path)}>
                                 {slides[currentSlide].btnText}
+                            </motion.button>
+                            <motion.button
+                                whileHover={{ scale: 1.05, background: 'rgba(0,0,0,0.05)' }}
+                                whileTap={{ scale: 0.95 }}
+                                className="glass" style={{
+                                    padding: '1rem 2rem',
+                                    borderRadius: '50px',
+                                    fontSize: '0.95rem',
+                                    fontWeight: 600,
+                                    color: 'var(--text-primary)',
+                                    cursor: 'pointer',
+                                    minWidth: '160px'
+                                }} onClick={onJoinCommunity}>
+                                Join Community
                             </motion.button>
                             <motion.button
                                 whileHover={{ scale: 1.05, background: 'rgba(0,0,0,0.05)' }}

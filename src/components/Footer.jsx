@@ -94,7 +94,7 @@ const Footer = () => {
                         <ul style={{ listStyle: 'none', padding: 0, display: 'grid', gap: '1rem' }}>
                             <li><Link to="/about" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}><motion.span whileHover={{ x: 5, display: 'inline-block' }}>About Ryzno</motion.span></Link></li>
                             <li><motion.a whileHover={{ x: 5 }} href="#contact" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Inquiry Form</motion.a></li>
-                            <li style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>info@ryzno.com</li>
+                            <li style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>theryznotrybe@gmail.com</li>
                             <li><motion.a whileHover={{ x: 5 }} href="#home" style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Back to top ^</motion.a></li>
                         </ul>
                     </motion.div>

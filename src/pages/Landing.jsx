@@ -7,22 +7,26 @@ import RoarSection from '../components/RoarSection';
 import ContactSection from '../components/ContactSection';
 import BookPresaleSection from '../components/BookPresaleSection';
 import AcademyAdSection from '../components/AcademyAdSection';
+import CommunityFormModal from '../components/CommunityFormModal';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 
 const Landing = () => {
+    const [isCommunityModalOpen, setIsCommunityModalOpen] = React.useState(false);
+
     return (
         <div className="landing">
             <Navbar />
             <main>
-                <HeroSection />
+                <HeroSection onJoinCommunity={() => setIsCommunityModalOpen(true)} />
                 <SoarSection />
                 <RestoreSection />
                 <RoarSection />
                 <BookPresaleSection />
-                <AcademyAdSection />
+                <AcademyAdSection onJoinCommunity={() => setIsCommunityModalOpen(true)} />
                 <ContactSection />
             </main>
+            <CommunityFormModal isOpen={isCommunityModalOpen} onClose={() => setIsCommunityModalOpen(false)} />
             <Footer />
         </div>
     );

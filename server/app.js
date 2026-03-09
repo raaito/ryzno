@@ -9,6 +9,7 @@ import Lesson from './models/Lesson.js';
 import Setting from './models/Setting.js';
 import Contact from './models/Contact.js';
 import RestoreRegistration from './models/RestoreRegistration.js';
+import CommunityMember from './models/CommunityMember.js';
 import { findAvailableSlots, validateAssignments, isSlotAvailable } from './utils/schedulingUtils.js';
 import { sendRegistrationConfirmation, sendReassignmentNotification } from './utils/whatsappService.js';
 import { sendRestoreConfirmationEmail, sendRestoreReassignmentEmail } from './utils/emailService.js';
@@ -736,6 +737,73 @@ app.delete('/api/contact/:id', authenticateToken, authorizeRole('LECTURER'), asy
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ message: 'Error deleting contact' });
+    }
+});
+
+// --- COMMUNITY ENDPOINTS ---
+app.post('/api/community/register', async (req, res) => {
+    try {
+        const member = await CommunityMember.create({
+            id: crypto.randomUUID(),
+            ...req.body
+        });
+        res.status(201).json({ success: true, message: 'Welcome to the community!', member });
+    } catch (error) {
+        console.error('Community Registration Error:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+app.get('/api/community/members', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    try {
+        const members = await CommunityMember.find({}).sort({ createdAt: -1 });
+        res.json(members);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching community members' });
+    }
+});
+
+app.get('/api/community/export-csv', authenticateToken, authorizeRole('LECTURER'), async (req, res) => {
+    try {
+        const members = await CommunityMember.find({}).sort({ createdAt: -1 });
+
+        const headers = [
+            'First Name', 'Surname', 'Email', 'Phone', 'Age Range',
+            'Birth Day', 'Birth Month', 'State', 'Profession',
+            'Social Platforms', 'Favourite Platform', 'Best Thing',
+            'Heard About Us', 'Reason for Joining', 'Actively Participate', 'Date Joined'
+        ];
+
+        let csvContent = headers.join(',') + '\n';
+
+        members.forEach(m => {
+            const row = [
+                m.firstName,
+                m.surname,
+                m.email,
+                m.phoneNumber,
+                m.ageRange,
+                m.birthDay,
+                m.birthMonth,
+                m.stateOfResidence,
+                m.profession,
+                `"${(m.socialPlatforms || []).join(', ')}"`,
+                m.favouritePlatform,
+                `"${(m.bestThing || '').replace(/"/g, '""')}"`,
+                `"${(m.heardAboutUs || '').replace(/"/g, '""')}"`,
+                `"${(m.reasonForJoining || '').replace(/"/g, '""')}"`,
+                m.activelyParticipate,
+                m.createdAt.toISOString()
+            ];
+            csvContent += row.join(',') + '\n';
+        });
+
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=ryzno_community_members.csv');
+        res.status(200).send(csvContent);
+    } catch (error) {
+        console.error('CSV Export Error:', error);
+        res.status(500).json({ message: 'Error exporting CSV' });
     }
 });
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, TrendingUp, CheckCircle, Award } from 'lucide-react';
 
-const AcademyAdSection = () => {
+const AcademyAdSection = ({ onJoinCommunity }) => {
     const [ad, setAd] = useState(null);
 
     useEffect(() => {
@@ -77,30 +77,49 @@ const AcademyAdSection = () => {
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                             <div style={{ background: '#000', color: '#fff', padding: '1rem 2rem', borderRadius: '16px', display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                                 <span style={{ fontSize: '0.9rem', fontWeight: 600, opacity: 0.8 }}>Access Fee:</span>
                                 <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>₦{ad.price.toLocaleString()}</span>
                             </div>
 
-                            <a
-                                href={ad.buttonLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                style={{
-                                    textDecoration: 'none',
-                                    color: '#000',
-                                    fontWeight: 800,
-                                    fontSize: '1rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.5rem',
-                                    borderBottom: '2px solid #000',
-                                    paddingBottom: '0.2rem'
-                                }}
-                            >
-                                Enroll Now <ArrowRight size={20} />
-                            </a>
+                            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                                <a
+                                    href={ad.buttonLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{
+                                        textDecoration: 'none',
+                                        color: '#000',
+                                        fontWeight: 800,
+                                        fontSize: '1rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem',
+                                        borderBottom: '2px solid #000',
+                                        paddingBottom: '0.2rem'
+                                    }}
+                                >
+                                    Enroll Now <ArrowRight size={20} />
+                                </a>
+
+                                <button
+                                    onClick={onJoinCommunity}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#666',
+                                        fontWeight: 700,
+                                        fontSize: '0.9rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.5rem'
+                                    }}
+                                >
+                                    Just join community <Users size={16} />
+                                </button>
+                            </div>
                         </div>
                     </motion.div>
 
