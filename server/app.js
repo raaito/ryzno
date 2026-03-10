@@ -743,14 +743,72 @@ app.delete('/api/contact/:id', authenticateToken, authorizeRole('LECTURER'), asy
 // --- COMMUNITY ENDPOINTS ---
 app.post('/api/community/register', async (req, res) => {
     try {
-        const member = await CommunityMember.create({
+        const { firstName, surname, email, birthDay, birthMonth } = req.body;
+
+        // 1. Check if already exists
+        let member = await CommunityMember.findOne({ email });
+        if (member) {
+            return res.status(400).json({ success: false, message: 'Email already registered in community' });
+        }
+
+        // 2. Create community member
+        member = await CommunityMember.create({
             id: crypto.randomUUID(),
             ...req.body
         });
-        res.status(201).json({ success: true, message: 'Welcome to the community!', member });
+
+        // 3. Create or Update User account
+        let user = await User.findOne({ email });
+        if (!user) {
+            // Create a new user for community members
+            const userId = crypto.randomUUID();
+            user = await User.create({
+                id: userId,
+                username: email.split('@')[0] + Math.floor(Math.random() * 1000),
+                email,
+                fullName: `${firstName} ${surname}`,
+                password: await bcrypt.hash('ryzno2026', 10),
+                role: 'STUDENT',
+                mustChangePassword: true
+            });
+        }
+
+        // 4. Generate Token for instant login
+        const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.status(201).json({
+            success: true,
+            message: 'Welcome to the community!',
+            member,
+            user: {
+                id: user.id,
+                username: user.username,
+                fullName: user.fullName,
+                role: user.role
+            },
+            token
+        });
     } catch (error) {
         console.error('Community Registration Error:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+app.get('/api/community/birthdays', async (req, res) => {
+    try {
+        const today = new Date();
+        const day = today.getDate().toString();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const month = monthNames[today.getMonth()];
+
+        const birthdays = await CommunityMember.find({
+            birthDay: day,
+            birthMonth: month
+        }).select('firstName surname profilePicture bestThing');
+
+        res.json(birthdays);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching birthdays' });
     }
 });
 

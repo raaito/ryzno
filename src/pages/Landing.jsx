@@ -8,6 +8,7 @@ import ContactSection from '../components/ContactSection';
 import BookPresaleSection from '../components/BookPresaleSection';
 import AcademyAdSection from '../components/AcademyAdSection';
 import CommunityFormModal from '../components/CommunityFormModal';
+import BirthdayShowcase from '../components/BirthdayShowcase';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 
@@ -22,6 +23,7 @@ const Landing = () => {
                 <SoarSection />
                 <RestoreSection />
                 <RoarSection />
+                <BirthdayShowcase />
                 <BookPresaleSection />
                 <AcademyAdSection onJoinCommunity={() => setIsCommunityModalOpen(true)} />
                 <ContactSection />

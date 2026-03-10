@@ -4,6 +4,7 @@ const communityMemberSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     surname: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
     ageRange: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     birthDay: { type: String, required: true },
@@ -16,6 +17,7 @@ const communityMemberSchema = new mongoose.Schema({
     heardAboutUs: { type: String, required: true },
     reasonForJoining: { type: String, required: true },
     activelyParticipate: { type: String, required: true }, // 'Yes' or 'No' as per form
+    profilePicture: { type: String }, // Base64 or URL
     createdAt: { type: Date, default: Date.now }
 });
 

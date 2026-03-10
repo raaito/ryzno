@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, CheckCircle, Users, Heart, Camera, MapPin, Briefcase, MessageSquare } from 'lucide-react';
-
+import { X, Send, CheckCircle, Users, Heart, Camera, MapPin, Briefcase, MessageSquare, Upload, User as UserIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 const CommunityFormModal = ({ isOpen, onClose }) => {
+    const { login } = useAuth();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('idle'); // idle, success, error
     const [formData, setFormData] = useState({
         firstName: '',
         surname: '',
+        email: '',
         ageRange: '',
         phoneNumber: '',
         birthDay: '',
@@ -20,7 +22,8 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
         bestThing: '',
         heardAboutUs: '',
         reasonForJoining: '',
-        activelyParticipate: ''
+        activelyParticipate: '',
+        profilePicture: ''
     });
 
     const [attemptedSubmit, setAttemptedSubmit] = useState(false);
@@ -40,12 +43,15 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
 
     const isStepValid = (s) => {
         if (s === 1) {
-            return formData.firstName && formData.surname && formData.ageRange && formData.phoneNumber && formData.birthDay && formData.birthMonth && formData.stateOfResidence && formData.profession;
+            return formData.firstName && formData.surname && formData.email && formData.ageRange && formData.phoneNumber && formData.birthDay && formData.birthMonth && formData.stateOfResidence && formData.profession;
         }
         if (s === 2) {
-            return formData.socialPlatforms.length > 0 && formData.favouritePlatform && formData.bestThing;
+            return true; // Profile picture is optional but encouraged
         }
         if (s === 3) {
+            return formData.socialPlatforms.length > 0 && formData.favouritePlatform && formData.bestThing;
+        }
+        if (s === 4) {
             return formData.heardAboutUs && formData.reasonForJoining && formData.activelyParticipate;
         }
         return true;
@@ -62,9 +68,24 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
 
     const prevStep = () => setStep(s => s - 1);
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) {
+                alert("File is too large. Please upload an image smaller than 2MB.");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData(prev => ({ ...prev, profilePicture: reader.result }));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
-        if (!isStepValid(3)) {
+        if (!isStepValid(4)) {
             setAttemptedSubmit(true);
             return;
         }
@@ -77,12 +98,20 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                 body: JSON.stringify(formData)
             });
 
+            const data = await response.json();
+
             if (response.ok) {
+                // Sync session
+                if (data.token && data.user) {
+                    login(data.user, data.token);
+                }
+
                 setStatus('success');
                 setTimeout(() => {
                     window.location.href = 'https://chat.whatsapp.com/B9B2IkLpJwnJziCsipSKAR?mode=hqrt3';
                 }, 2000);
             } else {
+                alert(data.message || 'Registration failed');
                 setStatus('error');
             }
         } catch (error) {
@@ -172,15 +201,15 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                         <>
                             <div style={{ marginBottom: '2.5rem' }}>
                                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                                    {[1, 2, 3].map(s => (
+                                    {[1, 2, 3, 4].map(s => (
                                         <div key={s} style={{ height: '4px', flex: 1, background: s <= step ? '#F59E0B' : '#E2E8F0', borderRadius: '2px', transition: 'all 0.4s ease' }}></div>
                                     ))}
                                 </div>
                                 <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0F172A' }}>
-                                    {step === 1 ? 'Join the Community' : step === 2 ? 'Your Presence' : 'Commitment'}
+                                    {step === 1 ? 'Join the Community' : step === 2 ? 'Profile Picture' : step === 3 ? 'Your Presence' : 'Commitment'}
                                 </h2>
                                 <p style={{ opacity: 0.6, fontSize: '0.95rem' }}>
-                                    {step === 1 ? 'Let\'s start with some basic details.' : step === 2 ? 'How do you express yourself?' : 'Final steps to join our tribe.'}
+                                    {step === 1 ? 'Let\'s start with some basic details.' : step === 2 ? 'Help us recognize you in the tribe.' : step === 3 ? 'How do you express yourself?' : 'Final steps to join our tribe.'}
                                 </p>
                             </div>
 
@@ -196,6 +225,10 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                                                 <label style={labelStyle}>Surname</label>
                                                 <input style={inputStyle('surname')} placeholder="Doe" value={formData.surname} onChange={e => setFormData({ ...formData, surname: e.target.value })} />
                                             </div>
+                                        </div>
+                                        <div style={{ marginBottom: '1.25rem' }}>
+                                            <label style={labelStyle}>Email Address</label>
+                                            <input type="email" style={inputStyle('email')} placeholder="john@example.com" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                                         </div>
                                         <div style={{ marginBottom: '1.25rem' }}>
                                             <label style={labelStyle}>Phone Number (WhatsApp)</label>
@@ -242,6 +275,27 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                                 )}
 
                                 {step === 2 && (
+                                    <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} style={{ textAlign: 'center' }}>
+                                        <div style={{ position: 'relative', width: '150px', height: '150px', margin: '0 auto 2rem auto' }}>
+                                            <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: '4px solid #fff', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
+                                                {formData.profilePicture ? (
+                                                    <img src={formData.profilePicture} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <UserIcon size={64} color="#CBD5E1" />
+                                                )}
+                                            </div>
+                                            <label style={{ position: 'absolute', bottom: '0', right: '0', background: '#F59E0B', color: '#fff', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '3px solid #fff', boxShadow: '0 5px 15px rgba(245, 158, 11, 0.3)' }}>
+                                                <Camera size={20} />
+                                                <input type="file" style={{ display: 'none' }} accept="image/*" onChange={handleImageUpload} />
+                                            </label>
+                                        </div>
+                                        <p style={{ fontSize: '0.9rem', color: '#64748B', maxWidth: '300px', margin: '0 auto 2rem auto' }}>
+                                            Upload a clear photo of yourself. We celebrate your presence in our community!
+                                        </p>
+                                    </motion.div>
+                                )}
+
+                                {step === 3 && (
                                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                                         <div style={{ marginBottom: '1.5rem' }}>
                                             <label style={labelStyle}>Social Media Platforms</label>
@@ -280,7 +334,7 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                                     </motion.div>
                                 )}
 
-                                {step === 3 && (
+                                {step === 4 && (
                                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
                                         <div style={{ marginBottom: '1.5rem' }}>
                                             <label style={labelStyle}>How did you hear about us?</label>
@@ -330,7 +384,7 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                                     )}
                                     <button
                                         type="button"
-                                        onClick={step === 3 ? handleSubmit : nextStep}
+                                        onClick={step === 4 ? handleSubmit : nextStep}
                                         disabled={loading}
                                         style={{
                                             flex: 2,
@@ -347,8 +401,8 @@ const CommunityFormModal = ({ isOpen, onClose }) => {
                                             opacity: loading ? 0.7 : 1
                                         }}
                                     >
-                                        {loading ? 'Submitting...' : step === 3 ? 'Join Community' : 'Next Step'}
-                                        {!loading && (step === 3 ? <CheckCircle size={18} /> : <Send size={18} />)}
+                                        {loading ? 'Submitting...' : step === 4 ? 'Join Community' : 'Next Step'}
+                                        {!loading && (step === 4 ? <CheckCircle size={18} /> : <Send size={18} />)}
                                     </button>
                                 </div>
                             </form>

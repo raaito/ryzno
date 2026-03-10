@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, BookOpen, Plus, Send, Radio, Video, ArrowLeft, Edit3, Trash2, X, Folder, Layers, LogOut, Mail, Calendar, User } from 'lucide-react';
+import { Upload, FileText, BookOpen, Plus, Send, Radio, Video, ArrowLeft, Edit3, Trash2, X, Folder, Layers, LogOut, Mail, Calendar, User, Users } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 

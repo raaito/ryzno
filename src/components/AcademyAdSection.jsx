@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Star, TrendingUp, CheckCircle, Award } from 'lucide-react';
+import { ArrowRight, Star, TrendingUp, CheckCircle, Award, Users } from 'lucide-react';
 
 const AcademyAdSection = ({ onJoinCommunity }) => {
     const [ad, setAd] = useState(null);
@@ -80,7 +80,7 @@ const AcademyAdSection = ({ onJoinCommunity }) => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                             <div style={{ background: '#000', color: '#fff', padding: '1rem 2rem', borderRadius: '16px', display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                                 <span style={{ fontSize: '0.9rem', fontWeight: 600, opacity: 0.8 }}>Access Fee:</span>
-                                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>₦{ad.price.toLocaleString()}</span>
+                                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f59e0b' }}>₦{(ad.price || 0).toLocaleString()}</span>
                             </div>
 
                             <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>

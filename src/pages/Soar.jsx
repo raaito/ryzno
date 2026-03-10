@@ -6,9 +6,12 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PillarContact from '../components/PillarContact';
 import AcademyAdSection from '../components/AcademyAdSection';
+import CommunityFormModal from '../components/CommunityFormModal';
 import soarImg from '../assets/soar.png';
 
 const Soar = () => {
+    const [isCommunityModalOpen, setIsCommunityModalOpen] = React.useState(false);
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
@@ -164,14 +167,15 @@ const Soar = () => {
                             <p style={{ color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2.5rem auto', fontSize: '1.1rem' }}>
                                 Join our community of Watchers, Guardians, and Mystics today.
                             </p>
-                            <a href="#" target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '1rem 3rem', background: 'var(--color-soar)', color: 'white', textDecoration: 'none' }}>
+                            <button onClick={() => setIsCommunityModalOpen(true)} className="btn-primary" style={{ border: 'none', cursor: 'pointer', padding: '1rem 3rem', background: 'var(--color-soar)', color: 'white', textDecoration: 'none', fontWeight: 700, fontSize: '1rem' }}>
                                 Register Now
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </section>
             </main>
-            <AcademyAdSection />
+            <AcademyAdSection onJoinCommunity={() => setIsCommunityModalOpen(true)} />
+            <CommunityFormModal isOpen={isCommunityModalOpen} onClose={() => setIsCommunityModalOpen(false)} />
             <Footer />
 
             <style dangerouslySetInnerHTML={{

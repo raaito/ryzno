@@ -64,10 +64,10 @@ const LecturerCommunity = () => {
     };
 
     const filteredMembers = members.filter(m =>
-        m.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.phoneNumber.includes(searchQuery)
+        (m.firstName?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (m.surname?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (m.email?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+        (m.phoneNumber || '').includes(searchQuery)
     );
 
     return (
@@ -147,6 +147,15 @@ const LecturerCommunity = () => {
                                 whileHover={{ scale: 1.01, boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
                             >
                                 <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+                                    <div style={{ width: '45px', height: '45px', borderRadius: '50%', overflow: 'hidden', background: '#f1f5f9' }}>
+                                        {member.profilePicture ? (
+                                            <img src={member.profilePicture} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem', fontWeight: 900, background: '#F59E0B', color: '#fff' }}>
+                                                {member.firstName[0]}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div>
                                         <div style={{ fontWeight: 800, fontSize: '1.1rem' }}>{member.firstName} {member.surname}</div>
                                         <div style={{ fontSize: '0.85rem', opacity: 0.5 }}>{member.email} • {member.phoneNumber}</div>
@@ -186,8 +195,12 @@ const LecturerCommunity = () => {
                         >
                             <div style={{ padding: '2.5rem', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                                    <div style={{ width: '64px', height: '64px', borderRadius: '24px', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyCenter: 'center', color: '#fff', fontSize: '1.5rem', fontWeight: 900 }}>
-                                        <User size={32} style={{ margin: '0 auto' }} />
+                                    <div style={{ width: '64px', height: '64px', borderRadius: '24px', overflow: 'hidden', background: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                                        {selectedMember.profilePicture ? (
+                                            <img src={selectedMember.profilePicture} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        ) : (
+                                            <User size={32} style={{ margin: '0 auto' }} />
+                                        )}
                                     </div>
                                     <div>
                                         <h2 style={{ fontSize: '1.75rem', fontWeight: 900, margin: 0 }}>{selectedMember.firstName} {selectedMember.surname}</h2>
