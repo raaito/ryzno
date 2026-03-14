@@ -1,19 +1,31 @@
-/**
- * Email Service Simulation
- * In production, this would use nodemailer with an SMTP transport or a service like SendGrid/Mailgun.
- */
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
-export const sendEmail = async (to, subject, html) => {
-    // Simulated email sending
-    console.log('---------------------------------------------------------');
-    console.log(`[EMAIL SIMULATION] TO: ${to}`);
-    console.log(`[EMAIL SIMULATION] SUBJECT: ${subject}`);
-    console.log(`[EMAIL SIMULATION] BODY (HTML): (Sent ${html.length} chars)`);
-    console.log('---------------------------------------------------------');
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
 
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    return true;
+export const sendEmail = async (to, subject, html, replyTo = null) => {
+    try {
+        const mailOptions = {
+            from: `"Ryzno" <${process.env.EMAIL_USER}>`,
+            to,
+            subject,
+            html,
+            ...(replyTo && { replyTo })
+        };
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`Email sent: ${info.messageId}`);
+        return true;
+    } catch (error) {
+        console.error('Error sending email:', error);
+        return false;
+    }
 };
 
 export const sendRestoreConfirmationEmail = async (data, credentials = null) => {

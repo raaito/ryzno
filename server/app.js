@@ -12,7 +12,7 @@ import RestoreRegistration from './models/RestoreRegistration.js';
 import CommunityMember from './models/CommunityMember.js';
 import { findAvailableSlots, validateAssignments, isSlotAvailable } from './utils/schedulingUtils.js';
 import { sendRegistrationConfirmation, sendReassignmentNotification } from './utils/whatsappService.js';
-import { sendRestoreConfirmationEmail, sendRestoreReassignmentEmail } from './utils/emailService.js';
+import { sendRestoreConfirmationEmail, sendRestoreReassignmentEmail, sendEmail } from './utils/emailService.js';
 
 import crypto from 'crypto';
 
@@ -463,8 +463,26 @@ app.post('/api/contact', async (req, res) => {
             message,
             source: source || 'General'
         });
+
+        // Forward message to the admin email
+        const adminEmail = process.env.EMAIL_USER;
+        const subject = `New Contact Form Submission from ${name} (${source || 'General'})`;
+        const html = `
+            <h2>New Contact Form Submission</h2>
+            <p><strong>Name:</strong> ${name}</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Source:</strong> ${source || 'General'}</p>
+            <hr />
+            <h3>Message:</h3>
+            <p>${message.replace(/\n/g, '<br>')}</p>
+        `;
+        
+        // Imported sendEmail earlier
+        await sendEmail(adminEmail, subject, html, email);
+
         res.status(201).json({ message: 'Message sent successfully' });
     } catch (error) {
+        console.error('Contact Error:', error);
         res.status(500).json({ message: 'Error sending message' });
     }
 });
