@@ -14,6 +14,8 @@ import { findAvailableSlots, validateAssignments, isSlotAvailable } from './util
 import { sendRegistrationConfirmation, sendReassignmentNotification } from './utils/whatsappService.js';
 import { sendRestoreConfirmationEmail, sendRestoreReassignmentEmail, sendEmail } from './utils/emailService.js';
 
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 import crypto from 'crypto';
 
 const app = express();
@@ -22,6 +24,28 @@ const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
     console.warn('WARNING: JWT_SECRET not found in environment. Auth will fail.');
 }
+
+// Apply Helmet for basic security headers
+app.use(helmet());
+
+// Global Rate Limiting
+const globalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 500, // Limit each IP to 500 requests per `window` (here, per 15 minutes)
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { message: 'Too many requests from this IP, please try again later.' }
+});
+app.use(globalLimiter);
+
+// Stricter Rate Limiting for Auth and Contact Endpoints
+export const strictLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    limit: 20, // Limit each IP to 20 requests per `window` (here, per hour)
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { message: 'Too many sensitive requests from this IP, please try again after an hour.' }
+});
 
 // Secure Health Check (Internal Use Only)
 app.get('/api/health', (req, res) => {
@@ -40,19 +64,16 @@ const allowedOrigins = [
     'http://localhost:3000',
     'http://127.0.0.1:5173',
     'http://127.0.0.1:3000',
-    'http://ryzno.test',
-    'http://ryzno.local',
     'https://ryzno.vercel.app',
-    'https://www.ryzno.com'
+    'https://www.ryzno.com',
+    'https://ryzno.com'
 ];
 
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin ||
             allowedOrigins.includes(origin) ||
-            origin.startsWith('http://localhost:') ||
-            origin.startsWith('http://127.0.0.1:') ||
-            origin.endsWith('.vercel.app')
+            (origin.startsWith('https://ryzno-') && origin.endsWith('.vercel.app')) // Allow specific Vercel preview environments
         ) {
             callback(null, true);
         } else {
@@ -92,7 +113,7 @@ const authorizeRole = (role) => {
 };
 
 // --- AUTH ENDPOINTS ---
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', strictLimiter, async (req, res) => {
     const { username, password, fullName, email } = req.body;
     try {
         const userExists = await User.findOne({ username });
@@ -114,7 +135,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', strictLimiter, async (req, res) => {
     const { username, password } = req.body;
     try {
         await connectDB();
@@ -144,7 +165,7 @@ app.post('/api/auth/change-password', authenticateToken, async (req, res) => {
     }
 });
 
-app.post('/api/auth/register-success', async (req, res) => {
+app.post('/api/auth/register-success', strictLimiter, async (req, res) => {
     const { username, password, fullName, email } = req.body;
 
     if (!username || !password || !fullName || !email) {
@@ -206,7 +227,7 @@ app.post('/api/auth/register-success', async (req, res) => {
         });
 
         console.log(`[ONBOARDING] Account created for ${email}. Access granted.`);
-        console.log(`[EMAIL SIMULATION] To: ${email} | Subject: Welcome to RYZNO | Body: Your login details: User: ${username}, Pass: ${password}`);
+        console.log(`[EMAIL SIMULATION] To: ${email} | Subject: Welcome to RYZNO | Body: Your login details have been securely sent to your email`);
 
         res.status(201).json({ message: 'Account created and access granted! Redirecting to login...' });
     } catch (error) {
@@ -347,8 +368,8 @@ app.post('/api/webhooks/selar', async (req, res) => {
         let user = await User.findOne({ $or: [{ email }, { username: email }] });
 
         if (!user) {
-            // Auto-create user
-            const generatedPassword = 'Sentinel2026!'; // Default password
+            // Auto-create user with secure random password
+            const generatedPassword = crypto.randomBytes(8).toString('hex');
             const hashedPassword = await bcrypt.hash(generatedPassword, 10);
 
             user = await User.create({
@@ -358,10 +379,11 @@ app.post('/api/webhooks/selar', async (req, res) => {
                 fullName: name,
                 email: email,
                 role: 'STUDENT',
-                courses: ['wealthy-place']
+                courses: ['wealthy-place'],
+                mustChangePassword: true
             });
 
-            console.log(`[AUTOMATION] Created new account for ${email}. Password: ${generatedPassword}`);
+            console.log(`[AUTOMATION] Created new account for ${email}. Default password securely generated.`);
             console.log(`[EMAIL SIMULATION] Sending Welcome Email to ${email} with credentials...`);
         } else {
             // Update existing user access
@@ -449,7 +471,7 @@ app.delete('/api/lessons/:id', authenticateToken, authorizeRole('LECTURER'), asy
 });
 
 // --- CONTACT ENDPOINTS ---
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', strictLimiter, async (req, res) => {
     console.log('Incoming contact request body:', req.body);
     const { name, email, message, source } = req.body;
     if (!name || !email || !message) {
@@ -537,7 +559,7 @@ app.get('/api/restore/my-registrations', authenticateToken, async (req, res) => 
     }
 });
 
-app.post('/api/restore/register', async (req, res) => {
+app.post('/api/restore/register', strictLimiter, async (req, res) => {
     console.log('Incoming Restore registration:', req.body);
     try {
         const { requestedDuration, feeAgreement, paymentPromise, paymentDate } = req.body;
